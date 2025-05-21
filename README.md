@@ -4,7 +4,13 @@
 [![Framework](https://img.shields.io/badge/framework-React%20Native-61DAFB)](https://reactnative.dev/)  
 [![License](https://img.shields.io/badge/license-MIT-green)](/LICENSE)
 
-![](https://israel-portfolio.com/assets/FrogeTV-IF_VaJ0I.png)
+<p align="center">
+  <img
+    src="https://israel-portfolio.com/assets/FrogeTV-IF_VaJ0I.png"
+    alt="FrogeTV"
+    width="400"
+  />
+</p>
 ---
 
 ## 🚀 Overview
