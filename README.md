@@ -4,6 +4,7 @@
 [![Framework](https://img.shields.io/badge/framework-React%20Native-61DAFB)](https://reactnative.dev/)  
 [![License](https://img.shields.io/badge/license-MIT-green)](/LICENSE)
 
+![](https://israel-portfolio.com/assets/FrogeTV-IF_VaJ0I.png)
 ---
 
 ## 🚀 Overview
@@ -65,3 +66,10 @@ Stream, chat, and use popular extensions (BTTV, FFZ, 7TV) on the go—no comprom
 ## 📄 License
 
 MIT © 2025 FrogeTV Contributors
+
+
+
+- [ ] Sync emotes playback  
+- [ ] Better PiP support on Android  
+
+> I’m exploring and learning native development to handle these features. Contributions are welcome!
