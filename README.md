@@ -73,7 +73,7 @@ Stream, chat, and use popular extensions (BTTV, FFZ, 7TV) on the go—no comprom
 
 MIT © 2025 FrogeTV Contributors
 
-
+## 📝 Todo
 
 - [ ] Sync emotes playback  
 - [ ] Better PiP support on Android  
