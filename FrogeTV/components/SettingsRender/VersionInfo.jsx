@@ -15,10 +15,10 @@ function VersionInfo() {
         </View>
         <View>
             <Text style={commonStyles.settingsText}>
-                Current App Version: v1.0.0-beta-2.b.2d
+                Current App Version: v1.0.0
             </Text>
             <Text style={commonStyles.settingsText}>
-                Software Author: Israel
+                Software Author: Israel G.
             </Text>
         </View>
     </View>
