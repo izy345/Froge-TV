@@ -1,12 +1,14 @@
 # 🐸 FrogeTV
 
-**Project Started On:** April 9, 2025 | **Platform:** iOS & Android | **Framework:** React Native
+[![Platform](https://img.shields.io/badge/platform-iOS%20%26%20Android-blue)](https://expo.dev/)  
+[![Framework](https://img.shields.io/badge/framework-React%20Native-61DAFB)](https://reactnative.dev/)  
+[![License](https://img.shields.io/badge/license-MIT-green)](/LICENSE)
 
 ---
 
 ## 🚀 Overview
 
-FrogeTV brings the full Twitch **desktop** experience to your mobile device!  
+FrogeTV brings the **full Twitch desktop experience** to your mobile device.  
 Stream, chat, and use popular extensions (BTTV, FFZ, 7TV) on the go—no compromises.
 
 ---
@@ -14,58 +16,52 @@ Stream, chat, and use popular extensions (BTTV, FFZ, 7TV) on the go—no comprom
 ## ✨ Key Features
 
 - 🎥 **Effortless Streaming**  
-  Deep Twitch API integration for smooth playback and exploration.  
+  Deep Twitch API integration for smooth playback and discovery.  
 - 💬 **Emote Auto-Completion**  
-  Instant suggestions from 7TV, BTTV, FFZ, and native Twitch emotes.  
+  Instant suggestions for Twitch, 7TV, BTTV, and FFZ emotes.  
 - 🖥️ **Desktop-Like UI**  
-  Optimized layouts for both phones and tablets.  
+  Optimized layouts for phones and tablets.  
 - 🔧 **Customizable Settings**  
-  Fine-tune API interceptors, theming, and more.  
+  API interceptors, theming, privacy toggles, and more.  
 - 🔄 **Redux & Thunks**  
-  Clean separation of state, logic, and styling.  
-- 📜 **Scalable Components**  
-  Reusable UI elements for rapid feature development.  
+  Clear separation of state, side-effects, and UI.  
+- 🔁 **Reusable Components**  
+  Build new features fast with a shared component library.  
 - 🗂️ **Smart Caching**  
-  Minimize API calls, maximize performance.  
+  Reduce API calls while keeping content fresh.  
 - 📐 **Adaptive Layouts**  
-  Auto-rotate support, preserve scroll position in all orientations.  
-- 🔛 **Picture-in-Picture**  
-  Continue watching streams while multitasking on iOS & Android.
+  Preserve scroll position on orientation changes.  
+- 🔳 **Picture-in-Picture**  
+  Watch streams while multitasking on iOS & Android.
 
 ---
 
-## 🎨 Technical Architecture
+## 🎨 Architecture
 
-1. **Root APIs**  
-   Expose low-level network hooks for ultimate flexibility.  
-2. **Virtual List Wrapper**  
-   Seamless scrolling & rotation without losing position.  
-3. **Expo Modules**  
-   Native Picture-in-Picture, background playback, and more.  
-4. **TypeScript**  
-   Strong typing across the entire codebase.  
-5. **Testing**  
-   Integrated unit tests with Jest & React Native Testing Library.
+1. **Root-Level APIs** – Expose low-level network hooks for custom use.  
+2. **Virtual List Wrapper** – Seamless scrolling & rotation without losing position.  
+3. **Expo Native Modules** – PiP, background audio, and deeper platform integration.  
+4. **TypeScript Everywhere** – End-to-end type safety.  
+5. **Testing** – Jest + React Native Testing Library for unit & integration tests.
 
 ---
 
 ## 📺 Demo
 
-▶️ Watch the live demo on YouTube:  
-https://www.youtube.com/watch?v=MgvPfFEubTA
+▶️ [Watch the live demo](https://www.youtube.com/watch?v=MgvPfFEubTA)
 
 ---
 
 ## 🤝 Contributing
 
 1. Fork the repo  
-2. Create a branch (`git checkout -b feature/my-feature`)  
+2. Create your branch (`git checkout -b feature/awesome`)  
 3. Commit your changes (`git commit -m "Add awesome feature"`)  
-4. Push (`git push origin feature/my-feature`)  
+4. Push to your fork (`git push origin feature/awesome`)  
 5. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-MIT License © 2025 FrogeTV Contributors
+MIT © 2025 FrogeTV Contributors
