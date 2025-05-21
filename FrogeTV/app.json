@@ -1,0 +1,65 @@
+{
+  "expo": {
+    "name": "FrogeTV",
+    "slug": "frogetv",
+    "scheme": "frogetv",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/Froge_TV.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/Froge_TV.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.frogetv.app",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": true
+      }
+    },
+    "android": {
+      "package": "com.frogetv.app",
+      "softwareKeyboardLayoutMode": "resize",
+      "configChanges": [
+        "orientation",
+        "screenSize",
+        "smallestScreenSize",
+        "keyboard",
+        "keyboardHidden"
+      ],
+      "versionCode": 1,
+      "minSdkVersion": 24,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/Froge_TV.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-sqlite",
+      "expo-pip",
+      "react-native-video",
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
+        }
+      ],
+      "expo-pip"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "23db5b23-c0ee-4c4e-acbb-3cc097505b67"
+      }
+    },
+    "owner": "izy345"
+  }
+}
