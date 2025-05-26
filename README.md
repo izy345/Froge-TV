@@ -11,6 +11,7 @@
     width="400"
   />
 </p>
+
 ---
 
 ## 🚀 Overview
@@ -72,6 +73,9 @@ Stream, chat, and use popular extensions (BTTV, FFZ, 7TV) on the go—no comprom
 ## 📄 License
 
 MIT © 2025 FrogeTV Contributors
+
+## Where are the commits prior to v1.0.0?
+- Prior commits are in my private backup repository.
 
 ## 📝 Todo
 

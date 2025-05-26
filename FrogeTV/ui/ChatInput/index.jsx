@@ -1,4 +1,4 @@
-import { useCallback, useRef, useMemo, useState } from "react";
+import { useCallback, useRef, useMemo, useState, useEffect } from "react";
 import { View, TextInput, StyleSheet, Animated, Text, ScrollView} from "react-native";
 import IconButton from "../CustomIcons/IconButton";
 import Colors from "../../constants";
@@ -129,7 +129,7 @@ function ChatInput({allEmotes, broadcasterId}) {
                         placeholderTextColor={Colors.twitchBlack700}
                         //multiline
                         numberOfLines={1}
-                        autoCapitalize={chatInput === '' ? 'none' : 'sentences'}
+                        //autoCapitalize={chatInput == '' ? 'none' : 'sentences'}
                         value={chatInput}
                         editable={!isSubmitting}
                         caretHidden={!isFocused}
@@ -144,6 +144,10 @@ function ChatInput({allEmotes, broadcasterId}) {
                         onSubmitEditing={() => {
                             handleSubmit();
                             setIsFocused(false);
+                        }}
+                        selection={{
+                            start: chatInput.length,
+                            end: chatInput.length,
                         }}
                         onChangeText={(text) => dispatch(chatInputSliceActions.setChatInput(text))}
                     />
