@@ -145,10 +145,7 @@ function ChatInput({allEmotes, broadcasterId}) {
                             handleSubmit();
                             setIsFocused(false);
                         }}
-                        selection={{
-                            start: chatInput.length,
-                            end: chatInput.length,
-                        }}
+
                         onChangeText={(text) => dispatch(chatInputSliceActions.setChatInput(text))}
                     />
                     <IconButton
