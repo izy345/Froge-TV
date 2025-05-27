@@ -5,6 +5,7 @@ import EmoteBehavior from "./EmoteBahavior";
 import { formatTwitchGivenEmotes } from "../../utils/FormatTwitchGivenEmotes";
 import { useDispatch } from "react-redux";
 import { emoteDetailsModalSliceActions } from "../../store/EmoteDetailsModal/emoteDetailsModal-slice";
+import EmoteSync from "./EmoteSync";
 
 function EmoteRenderer({
     message = "",
@@ -161,13 +162,17 @@ function EmoteRenderer({
                                 marginBottom: 8,
                             }}
                         >
-                            <Image
+                            {/*<Image
                                 key={i}
                                 recyclingKey={emote.emoteUrl}
                                 source={{ uri: emote.emoteUrl }}
                                 style={emoteStyle}
                                 contentFit="contain"
                                 cachePolicy='disk'
+                            />*/}
+                            <EmoteSync
+                                source={emote.emoteUrl}
+                                style={emoteStyle}
                             />
                         </Pressable>
                     );

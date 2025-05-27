@@ -16,6 +16,7 @@
     "@react-navigation/native-stack": "^7.3.10",
     "@reduxjs/toolkit": "^2.6.1",
     "@shopify/flash-list": "^1.8.0",
+    "@shopify/react-native-skia": "^1.5.0",
     "axios": "^1.8.4",
     "expo": "~52.0.43",
     "expo-auth-session": "~6.0.3",
@@ -48,8 +49,7 @@
     "react-native-webview": "13.12.5",
     "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
-    "tmi.js": "^1.8.5",
-    "@shopify/react-native-skia": "1.5.0"
+    "tmi.js": "^1.8.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
