@@ -162,18 +162,25 @@ function EmoteRenderer({
                                 marginBottom: 8,
                             }}
                         >
-                            {/*<Image
-                                key={i}
-                                recyclingKey={emote.emoteUrl}
-                                source={{ uri: emote.emoteUrl }}
-                                style={emoteStyle}
-                                contentFit="contain"
-                                cachePolicy='disk'
-                            />*/}
-                            <EmoteSync
-                                source={emote.emoteUrl}
-                                style={emoteStyle}
-                            />
+                            {  // future plans maybe: check for animations and use sync instead?
+                            // likely to be a beta setting in the future. RN just doesn't support sync playaback.
+                            // Hence this hacky implementation. 
+                            true ? 
+                                <Image
+                                    key={i}
+                                    recyclingKey={emote.emoteUrl}
+                                    source={{ uri: emote.emoteUrl }}
+                                    style={emoteStyle}
+                                    contentFit="contain"
+                                    cachePolicy='disk'
+                                /> 
+                            :
+                                <EmoteSync
+                                    source={emote.emoteUrl}
+                                    style={emoteStyle}
+                                    emoteId={emote.emoteUrl}
+                                />
+                            }
                         </Pressable>
                     );
                     i++;
