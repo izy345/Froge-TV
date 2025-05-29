@@ -81,7 +81,6 @@ streamActions.getTwitchEmotes = (broadcaster_id, allowChannelEmotes = false) => 
             const response = await request('get', 'chat/emotes', {
                 broadcaster_id: broadcaster_id,
             });
-
             // For each emote:
             // - Create a new object with keys:
             //      'emoteName': emote.name
@@ -99,6 +98,7 @@ streamActions.getTwitchEmotes = (broadcaster_id, allowChannelEmotes = false) => 
                         emoteName: emote.name,
                         emoteUrl: newEmoteUrl,
                         emoteId: emote.id,
+                        isAnimated: hasAnimated,
                         type: 'Twitch-Channel',
                     };
                 });
@@ -115,7 +115,9 @@ streamActions.getTwitchEmotes = (broadcaster_id, allowChannelEmotes = false) => 
                     emoteName: emote.name,
                     emoteUrl: newEmoteUrl,
                     emoteId: emote.id,
+                    isAnimated: hasAnimated,
                     type: 'Twitch-Global',
+                    
                 };
             });
 
@@ -155,6 +157,7 @@ streamActions.getTwitchEmotes = (broadcaster_id, allowChannelEmotes = false) => 
                                 ownerLogin = ownerCache[emote.owner_id];
                             }
                             const format = (emote.format && emote.format[1]) || 'static';
+                            const hasAnimated = emote.format.includes("animated");
                             const scale = '2.0' || (emote.scale && emote.scale[0]);
                             const theme = (emote.theme_mode && emote.theme_mode[0]) || 'light';
                             const emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/${format}/${theme}/${scale}`;
@@ -163,6 +166,7 @@ streamActions.getTwitchEmotes = (broadcaster_id, allowChannelEmotes = false) => 
                                 emoteUrl,
                                 emoteId: emote.id,
                                 type: `Twitch-${ownerLogin ?? 'Unlocked'}`,
+                                isAnimated: hasAnimated,
                             };
                         })
                     )
@@ -230,7 +234,6 @@ streamActions.get7TVEmotes = (broadcaster_id) => {
             // Fetch global 7TV emotes
             const globalResponse = await requestURL('get', 'https://7tv.io/v3/emote-sets/global');
             const globalEmotes = globalResponse.data?.emotes ?? [];
-
             const parsedGlobalEmotes = globalEmotes.map(emote => {
                 const file2x = emote.data.host.files.find(file => file.name.startsWith("2x."));
                 return {
@@ -241,6 +244,7 @@ streamActions.get7TVEmotes = (broadcaster_id) => {
                     flag: Array.isArray(emote.data.flags)
                         ? emote.data.flags
                         : (emote.data.flags ? [emote.data.flags] : []),
+                    isAnimated: emote.data.animated || false,
                     type: '7TV-Global',
                 };
             });
@@ -259,6 +263,7 @@ streamActions.get7TVEmotes = (broadcaster_id) => {
                     flag: Array.isArray(emote.data.flags)
                         ? emote.data.flags
                         : (emote.data.flags ? [emote.data.flags] : []),
+                    isAnimated: emote.data.animated || false,
                     type: '7TV-Channel',
                 };
             });
@@ -305,6 +310,7 @@ streamActions.getBTTVEmotes = (broadcaster_id) => {
                     flag: Array.isArray(emote.modifier)
                         ? emote.modifier.map(mod => String(mod))
                         : (emote.hasOwnProperty("modifier") ? [String(emote.modifier)] : []),
+                    isAnimated: emote.animated || false,
                     type: 'BTTV-Channel',
 
                 }));
@@ -317,6 +323,7 @@ streamActions.getBTTVEmotes = (broadcaster_id) => {
                     flag: Array.isArray(emote.modifier)
                         ? emote.modifier.map(mod => String(mod))
                         : (emote.hasOwnProperty("modifier") ? [String(emote.modifier)] : []),
+                    isAnimated: emote.animated || false,
                     type: 'BTTV-Channel',
                 }));
 
@@ -387,6 +394,7 @@ streamActions.getFFZEmotes = (broadcaster_id) => {
                                 emoteUrl: emote.urls && emote.urls["1"] ? emote.urls["1"] : "",
                                 width: 32,
                                 height: 32,
+                                isAnimated: false,
                                 type: "FFZ-Global",
                             };
                         });
@@ -410,6 +418,7 @@ streamActions.getFFZEmotes = (broadcaster_id) => {
                             emoteUrl: emote.urls && emote.urls["1"] ? emote.urls["1"] : "",
                             width: 32,
                             height: 32,
+                            isAnimated: false,
                             type: "FFZ-Channel",
                         };
                     });

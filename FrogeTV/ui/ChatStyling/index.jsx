@@ -27,6 +27,7 @@ function ChatStyling({
 }) {
 
     const showBTTVBadges = useSelector((state) => state.config.showBTTVBadges);
+    const attemptEmoteSync = useSelector((state) => state.config.attemptEmoteSync);
 
 
     const isMentioned = useMemo(() => {
@@ -99,6 +100,7 @@ function ChatStyling({
                     message={chatMsg}
                     emotes={emotes}
                     twitchGivenEmoteList={allowedEmotes}
+                    attemptEmoteSync={attemptEmoteSync}
                 />
             </Text>
         </View>

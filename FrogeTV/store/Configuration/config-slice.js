@@ -7,10 +7,11 @@ const configSlice = createSlice({
         chatScrollAnimationIsActive: false,
         includeAtOnReplies: true, // likely to never be used 
         hideDeletedMessages: false,
+        msgsDelay: 0,
+        attemptEmoteSync: false,
         // badges
         showBTTVBadges: true,
         showFFZBadges: true,
-        msgsDelay: 0,
         // 3rd party emotes
         showBTTVEmotes: true,
         showFFZEmotes: true,
@@ -34,7 +35,9 @@ const configSlice = createSlice({
         setHideDeletedMessages(state, action) {
             state.hideDeletedMessages = action.payload;
         },
-
+        setAttemptEmoteSync(state, action) {
+            state.attemptEmoteSync = action.payload;
+        },
         // ExploreHistory saved
         setExploreHistory(state, action) {
             state.ExploreHistory = action.payload;

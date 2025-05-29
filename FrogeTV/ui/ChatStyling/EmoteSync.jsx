@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { View, StyleSheet } from "react-native";
 import { Canvas, Image, useAnimatedImage } from "@shopify/react-native-skia";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,7 +6,6 @@ import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
 
 const animationStartTime = Date.now();
 
-// attempt to sync animated emotes with the Skia library
 export default function EmoteSync({ emoteId, source, style }) {
     const dispatch = useDispatch();
 
@@ -14,44 +13,54 @@ export default function EmoteSync({ emoteId, source, style }) {
     const width = flattenedStyle.width ?? 32;
     const height = flattenedStyle.height ?? 32;
 
-    const animatedImage = useAnimatedImage(source);
+    const memoizedSource = useMemo(() => source, [source]);
+    const animatedImage = useAnimatedImage(memoizedSource);
+
     const cachedEmote = useSelector(getEmoteData(emoteId));
 
     const [currentFrameImage, setCurrentFrameImage] = useState(null);
+    const currentFrameIndexRef = useRef(-1);
 
-    // Step 1: Decode once and cache frame metadata if not already cached
+    // Decode and cache emote frames on first load
     useEffect(() => {
         if (!animatedImage || cachedEmote) return;
 
         const frameCount = animatedImage.getFrameCount();
-        const durations = [];
-        const frameImages = [];
+        const frameDurations = [];
+        const frames = [];
 
         for (let i = 0; i < frameCount; i++) {
             animatedImage.decodeNextFrame();
-            durations.push(animatedImage.currentFrameDuration());
-            frameImages.push(animatedImage.getCurrentFrame());
+            frameDurations.push(animatedImage.currentFrameDuration());
+            frames.push(animatedImage.getCurrentFrame());
         }
 
-        const totalDuration = durations.reduce((a, b) => a + b, 0);
+        const totalDuration = frameDurations.reduce((a, b) => a + b, 0);
 
         dispatch(
             cacheSliceActions.addEmoteCache({
                 emoteId,
                 emoteUrl: source,
-                frameDurations: durations,
+                frameDurations,
                 totalDuration,
                 frameCount,
-                frames: frameImages,
+                frames,
             })
         );
     }, [animatedImage, cachedEmote]);
 
-    // Step 2: Animation ticker
+    // Sync animation to global time using Date.now()
     useEffect(() => {
         if (!cachedEmote?.frames?.length || !cachedEmote.frameDurations) return;
 
-        let isMounted = true;
+        // guard against static emotes
+        if (cachedEmote.frameCount <= 1) {
+            // Static image - just set frame once and no animation loop needed
+            setCurrentFrameImage(cachedEmote.frames[0]);
+            return; // skip animation loop
+        }
+
+        let mounted = true;
 
         const getCurrentFrameIndex = () => {
             const elapsed = Date.now() - animationStartTime;
@@ -66,11 +75,15 @@ export default function EmoteSync({ emoteId, source, style }) {
         };
 
         const updateFrame = () => {
-            if (!isMounted) return;
+            if (!mounted) return;
 
             const index = getCurrentFrameIndex();
-            const frame = cachedEmote.frames[index];
-            setCurrentFrameImage(frame);
+
+            if (index !== currentFrameIndexRef.current) {
+                currentFrameIndexRef.current = index;
+                const frame = cachedEmote.frames[index];
+                if (frame) setCurrentFrameImage(frame);
+            }
 
             requestAnimationFrame(updateFrame);
         };
@@ -78,11 +91,10 @@ export default function EmoteSync({ emoteId, source, style }) {
         updateFrame();
 
         return () => {
-            isMounted = false;
+            mounted = false;
         };
     }, [cachedEmote]);
 
-    // Placeholder
     if (!currentFrameImage) {
         return <View style={[styles.placeholder, { width, height }]} />;
     }
@@ -103,6 +115,6 @@ export default function EmoteSync({ emoteId, source, style }) {
 
 const styles = StyleSheet.create({
     placeholder: {
-        backgroundColor: "#222",
+        backgroundColor: "#1a1a1a",
     },
 });

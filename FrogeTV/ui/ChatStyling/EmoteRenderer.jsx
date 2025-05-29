@@ -13,8 +13,10 @@ function EmoteRenderer({
     enforceTwitchEmotePolicy = false,
     twitchGivenEmoteList = [],
     style = {},
+    attemptEmoteSync = false,
 }) {
     const dispatch = useDispatch();
+    
 
     const { combinedEmotes, formattedTwitchEmotes } = useMemo(() => {
         let baseEmotes = [...emotes];
@@ -162,10 +164,8 @@ function EmoteRenderer({
                                 marginBottom: 8,
                             }}
                         >
-                            {  // future plans maybe: check for animations and use sync instead?
-                            // likely to be a beta setting in the future. RN just doesn't support sync playaback.
-                            // Hence this hacky implementation. 
-                            true ? 
+                            {  // Experimental: Use EmoteSync for animated emotes
+                            !emote.isAnimated && !attemptEmoteSync ? 
                                 <Image
                                     key={i}
                                     recyclingKey={emote.emoteUrl}

@@ -9,6 +9,7 @@ import ChatShowBTTVEmotes from './ChatShowBTTVEmotes'
 import ChatShowFFZEmotes from './ChatShowFFZEmotes'
 import ChatShow7TVEmotes from './ChatShow7TVEmotes'
 import VersionInfo from './VersionInfo'
+import SyncEmote from './SyncEmotes'
 
 function SettingsRender() {
     return (
@@ -21,6 +22,8 @@ function SettingsRender() {
         <ChatShowBTTVEmotes />
         <ChatShowFFZEmotes />
         <ChatShow7TVEmotes />
+        <Text style={styles.boldText}> Experimental</Text>
+        <SyncEmote />
         <VersionInfo />
     </ScrollView>
     )
