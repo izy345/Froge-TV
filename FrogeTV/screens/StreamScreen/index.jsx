@@ -84,7 +84,6 @@ export default StreamScreen;
 const styles = StyleSheet.create({
     root: {
         flexGrow: 1,
-        //paddingTop: Platform.OS === 'android' ? SB.currentHeight : 0,
         paddingTop: Platform.OS === 'android' && !__DEV__ ? SB.currentHeight : 0,
     },
     rootLandscape:{
