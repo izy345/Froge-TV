@@ -176,6 +176,7 @@ function EmoteRenderer({
                                 /> 
                             :
                                 <EmoteSync
+                                    key={emote.emoteUrl}
                                     source={emote.emoteUrl}
                                     style={emoteStyle}
                                     emoteId={emote.emoteUrl}
