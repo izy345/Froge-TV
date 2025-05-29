@@ -3,7 +3,7 @@ import { Text, StyleSheet, Pressable } from "react-native";
 import { Image } from "expo-image";
 import EmoteBehavior from "./EmoteBahavior";
 import { formatTwitchGivenEmotes } from "../../utils/FormatTwitchGivenEmotes";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { emoteDetailsModalSliceActions } from "../../store/EmoteDetailsModal/emoteDetailsModal-slice";
 import EmoteSync from "./EmoteSync";
 
@@ -165,7 +165,14 @@ function EmoteRenderer({
                             }}
                         >
                             {  // Experimental: Use EmoteSync for animated emotes
-                            !emote.isAnimated && !attemptEmoteSync ? 
+                            (emote.isAnimated && attemptEmoteSync) ? 
+                                <EmoteSync
+                                    key={emote.emoteUrl}
+                                    source={emote.emoteUrl}
+                                    style={emoteStyle}
+                                    emoteId={emote.emoteUrl}
+                                />
+                            :
                                 <Image
                                     key={i}
                                     recyclingKey={emote.emoteUrl}
@@ -174,13 +181,6 @@ function EmoteRenderer({
                                     contentFit="contain"
                                     cachePolicy='disk'
                                 /> 
-                            :
-                                <EmoteSync
-                                    key={emote.emoteUrl}
-                                    source={emote.emoteUrl}
-                                    style={emoteStyle}
-                                    emoteId={emote.emoteUrl}
-                                />
                             }
                         </Pressable>
                     );
