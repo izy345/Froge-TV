@@ -12,6 +12,7 @@ import { userDetailsModalSliceActions } from "../../store/UserDetailsModal/user-
 import { emoteDetailsModalSliceActions } from "../../store/EmoteDetailsModal/emoteDetailsModal-slice";
 import { useIsFocused } from "@react-navigation/native";
 import { chatInputSliceActions } from "../../store/ChatInput/chatInput-slice";
+import { __DEV__ } from "react-native";
 
 function StreamScreen({ route, navigation }) {
 
@@ -57,7 +58,7 @@ function StreamScreen({ route, navigation }) {
 
     return (
         <IOSKeyboardAvoidingView
-            style ={{ flex: 1, flexGrow: 1 }}
+            style ={{ flex: 1, flexGrow: 1, }}
             behavior={"padding"}
         >
             <SafeAreaView style={[!phoneIsPotrait ? styles.rootLandscape : styles.root]}>
@@ -83,7 +84,8 @@ export default StreamScreen;
 const styles = StyleSheet.create({
     root: {
         flexGrow: 1,
-        paddingTop: Platform.OS === 'android' ? SB.currentHeight : 0,
+        //paddingTop: Platform.OS === 'android' ? SB.currentHeight : 0,
+        paddingTop: Platform.OS === 'android' && !__DEV__ ? SB.currentHeight : 0,
     },
     rootLandscape:{
         flex: 1,
