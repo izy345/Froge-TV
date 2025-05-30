@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const MAX_EMOTE_CACHE_SIZE = 100;
+
 const cacheSlice = createSlice({
     name: 'cacheSlice',
     initialState: {
@@ -34,26 +36,31 @@ const cacheSlice = createSlice({
         // emote cache
         addEmoteCache(state, action) {
             const {
-            emoteId,
-            emoteUrl,
-            frameDurations,
-            totalDuration,
-            frameCount,
-            frames, // optional: array of SkImage
+                emoteId,
+                emoteUrl,
+                frameDurations,
+                totalDuration,
+                frameCount,
+                frames,
             } = action.payload || {};
-    
+        
             if (!emoteId || !emoteUrl) throw new Error("Invalid emote cache payload");
-    
+        
             const existing = state.emoteCache.find((e) => e.emoteId === emoteId);
             if (existing) return;
-    
+        
+            // Remove the oldest emote if the cache size exceeds the limit
+            if (state.emoteCache.length >= MAX_EMOTE_CACHE_SIZE) {
+                state.emoteCache.shift(); // Remove the first (oldest) emote
+            }
+        
             state.emoteCache.push({
-            emoteId,
-            emoteUrl,
-            frameDurations,
-            totalDuration,
-            frameCount,
-            frames,
+                emoteId,
+                emoteUrl,
+                frameDurations,
+                totalDuration,
+                frameCount,
+                frames,
             });
         },
         setEmoteCache(state, action) {
