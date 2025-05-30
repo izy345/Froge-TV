@@ -9,6 +9,7 @@ const configSlice = createSlice({
         hideDeletedMessages: false,
         msgsDelay: 0,
         attemptEmoteSync: false,
+        maxEmoteCacheSize: 250,
         // badges
         showBTTVBadges: true,
         showFFZBadges: true,
@@ -37,6 +38,9 @@ const configSlice = createSlice({
         },
         setAttemptEmoteSync(state, action) {
             state.attemptEmoteSync = action.payload;
+        },
+        setMaxEmoteCacheSize(state, action) {
+            state.maxEmoteCacheSize = action.payload;
         },
         // ExploreHistory saved
         setExploreHistory(state, action) {

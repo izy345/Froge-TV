@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const MAX_EMOTE_CACHE_SIZE = 250;
+
 
 const cacheSlice = createSlice({
     name: 'cacheSlice',
@@ -50,7 +50,7 @@ const cacheSlice = createSlice({
             if (existing) return;
         
             // Remove the oldest emote if the cache size exceeds the limit
-            if (state.emoteCache.length >= MAX_EMOTE_CACHE_SIZE) {
+            if (state.emoteCache.length >= 125) {
                 state.emoteCache.shift(); // Remove the first (oldest) emote
             }
         

@@ -6,6 +6,7 @@ import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
 
 const animationStartTime = Date.now();
 
+// Upcoming plans: Use native module to construct into a gif or webp to help with performance
 export default function EmoteSync({ emoteId, source, style }) {
     const dispatch = useDispatch();
 

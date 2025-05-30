@@ -10,6 +10,7 @@ import ChatShowFFZEmotes from './ChatShowFFZEmotes'
 import ChatShow7TVEmotes from './ChatShow7TVEmotes'
 import VersionInfo from './VersionInfo'
 import SyncEmote from './SyncEmotes'
+//import EmoteCacheSize from './EmoteCacheSize'
 
 function SettingsRender() {
     return (

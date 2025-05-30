@@ -5,6 +5,7 @@ import SwitchToggle from '../../ui/SwitchToggle'
 import { useSelector, useDispatch } from 'react-redux'
 import { configSliceActions } from '../../store/Configuration/config-slice'
 
+// currently an experimental feature, more work required for proper efficiency and performance
 function SyncEmote() {
 
     const dispatch = useDispatch();
