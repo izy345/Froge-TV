@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const MAX_EMOTE_CACHE_SIZE = 100;
+const MAX_EMOTE_CACHE_SIZE = 250;
 
 const cacheSlice = createSlice({
     name: 'cacheSlice',
