@@ -9,9 +9,9 @@ const animationStartTime = Date.now();
 export default function EmoteSync({ emoteId, source, style }) {
     const dispatch = useDispatch();
 
-    const flattenedStyle = StyleSheet.flatten(style) || {};
-    const width = flattenedStyle.width ?? 32;
-    const height = flattenedStyle.height ?? 32;
+    //const flattenedStyle = StyleSheet.flatten(style) || {};
+    const width = style.width ?? 32;
+    const height = style.height ?? 32;
 
     const memoizedSource = useMemo(() => source, [source]);
     const animatedImage = useAnimatedImage(memoizedSource);

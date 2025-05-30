@@ -3,7 +3,7 @@
     "name": "FrogeTV",
     "slug": "frogetv",
     "scheme": "frogetv",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "default",
     "icon": "./assets/Froge_TV.png",
     "userInterfaceStyle": "light",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.frogetv.app",
-      "buildNumber": "1.0.1",
+      "buildNumber": "1.0.2",
       "infoPlist": {
         "UIViewControllerBasedStatusBarAppearance": true
       }
@@ -31,7 +31,7 @@
         "keyboard",
         "keyboardHidden"
       ],
-      "versionCode": 2,
+      "versionCode": 3,
       "minSdkVersion": 24,
       "adaptiveIcon": {
         "foregroundImage": "./assets/Froge_TV.png",
