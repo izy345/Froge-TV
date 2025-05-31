@@ -29,7 +29,7 @@ function SyncEmote() {
                 The Image APIs available in React Native have no support for frame manipulation.
                 This hack will attempt to sync the playback of emotes in chat by using a 'hacky' solution. 
                 This option also fixes ghosting issues with emotes that you may encounter in ios.
-                May cause performance do be slightly degraded. 
+                May cause performance to be degraded. Needs more work and testing. 
             </Text>
         </View>
     </View>
