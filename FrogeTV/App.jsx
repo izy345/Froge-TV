@@ -7,7 +7,7 @@ import { Platform, Text} from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 import ExpoPip from "expo-pip";
 import PIPModeAndroid from './routes/PIPModeAndroid'
-//import expoAndroidPip from './modules/expo-android-pip';
+import { FrameTickProvider } from './utils/FrameTickProvider';
 
 export default function App() {
     const { isInPipMode } = ExpoPip.useIsInPip();
@@ -22,7 +22,9 @@ export default function App() {
     return (
         <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
-                { !isInPipMode ? <Routes /> : <PIPModeAndroid/>}
+                <FrameTickProvider>
+                    { !isInPipMode ? <Routes /> : <PIPModeAndroid/>}
+                </FrameTickProvider>
             </PersistGate>
         </Provider>
     );

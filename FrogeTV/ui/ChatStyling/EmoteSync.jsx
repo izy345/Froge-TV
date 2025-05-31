@@ -1,28 +1,23 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { View, StyleSheet } from "react-native";
 import { Canvas, Image, useAnimatedImage } from "@shopify/react-native-skia";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
+import { useFrameTick } from "../../utils/FrameTickProvider";
 
 const animationStartTime = Date.now();
 
-// Upcoming plans: Use native module to construct into a gif or webp to help with performance
 export default function EmoteSync({ emoteId, source, style }) {
     const dispatch = useDispatch();
+    const width = style?.width ?? 32;
+    const height = style?.height ?? 32;
 
-    //const flattenedStyle = StyleSheet.flatten(style) || {};
-    const width = style.width ?? 32;
-    const height = style.height ?? 32;
-
+    const tick = useFrameTick(); // 👈 This replaces the tick prop
     const memoizedSource = useMemo(() => source, [source]);
     const animatedImage = useAnimatedImage(memoizedSource);
-
     const cachedEmote = useSelector(getEmoteData(emoteId));
 
-    const [currentFrameImage, setCurrentFrameImage] = useState(null);
-    const currentFrameIndexRef = useRef(-1);
-
-    // Decode and cache emote frames on first load
+    // Cache emote frames
     useEffect(() => {
         if (!animatedImage || cachedEmote) return;
 
@@ -50,51 +45,23 @@ export default function EmoteSync({ emoteId, source, style }) {
         );
     }, [animatedImage, cachedEmote]);
 
-    // Sync animation to global time using Date.now()
-    useEffect(() => {
-        if (!cachedEmote?.frames?.length || !cachedEmote.frameDurations) return;
+    // Pure frame calculation
+    const currentFrameImage = useMemo(() => {
+        if (!cachedEmote?.frames?.length || !cachedEmote.frameDurations)
+            return null;
+        if (cachedEmote.frameCount <= 1) return cachedEmote.frames[0];
 
-        // guard against static emotes
-        if (cachedEmote.frameCount <= 1) {
-            // Static image - just set frame once and no animation loop needed
-            setCurrentFrameImage(cachedEmote.frames[0]);
-            return; // skip animation loop
+        const elapsed = tick - animationStartTime;
+        let time = elapsed % cachedEmote.totalDuration;
+
+        for (let i = 0; i < cachedEmote.frameDurations.length; i++) {
+            if (time < cachedEmote.frameDurations[i])
+                return cachedEmote.frames[i];
+            time -= cachedEmote.frameDurations[i];
         }
 
-        let mounted = true;
-
-        const getCurrentFrameIndex = () => {
-            const elapsed = Date.now() - animationStartTime;
-            let time = elapsed % cachedEmote.totalDuration;
-
-            for (let i = 0; i < cachedEmote.frameDurations.length; i++) {
-                if (time < cachedEmote.frameDurations[i]) return i;
-                time -= cachedEmote.frameDurations[i];
-            }
-
-            return 0;
-        };
-
-        const updateFrame = () => {
-            if (!mounted) return;
-
-            const index = getCurrentFrameIndex();
-
-            if (index !== currentFrameIndexRef.current) {
-                currentFrameIndexRef.current = index;
-                const frame = cachedEmote.frames[index];
-                if (frame) setCurrentFrameImage(frame);
-            }
-
-            requestAnimationFrame(updateFrame);
-        };
-
-        updateFrame();
-
-        return () => {
-            mounted = false;
-        };
-    }, [cachedEmote]);
+        return cachedEmote.frames[0];
+    }, [tick, cachedEmote]);
 
     if (!currentFrameImage) {
         return <View style={[styles.placeholder, { width, height }]} />;
