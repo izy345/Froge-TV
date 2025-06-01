@@ -37,7 +37,7 @@ export default function EmoteSync({ emoteId, source, style }) {
         }
 
         const totalDuration = frameDurations.reduce((a, b) => a + b, 0);
-
+        //console.log('frames', frames);
         dispatch(
             cacheSliceActions.addEmoteCache({
                 emoteId,

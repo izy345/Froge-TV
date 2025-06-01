@@ -1,0 +1,17 @@
+{
+  "platforms": [
+    "apple",
+    "android",
+    "web"
+  ],
+  "apple": {
+    "modules": [
+      "EmoteGifEncoderModule"
+    ]
+  },
+  "android": {
+    "modules": [
+      "expo.modules.emotegifencoder.EmoteGifEncoderModule"
+    ]
+  }
+}
