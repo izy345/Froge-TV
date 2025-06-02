@@ -14,12 +14,13 @@ public class EmoteGifEncoderModule: Module {
         throw NSError(domain: "EmoteGifEncoder", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create GIF destination"])
       }
 
-      // Global GIF properties
+      // Set global GIF properties BEFORE adding frames
       let gifProperties = [
         kCGImagePropertyGIFDictionary: [
-          kCGImagePropertyGIFLoopCount: 0
+          kCGImagePropertyGIFLoopCount: 0  // Loop infinitely
         ]
       ] as CFDictionary
+      CGImageDestinationSetProperties(destination, gifProperties)
 
       for (index, base64String) in base64Frames.enumerated() {
         guard let imageData = Data(base64Encoded: base64String),
@@ -30,28 +31,15 @@ public class EmoteGifEncoderModule: Module {
 
         let delayTime = durations[index] / 1000.0
 
-        // Apply loop count to the first frame as well (important for proper looping)
-        let frameProps: CFDictionary = {
-          if index == 0 {
-            return [
-              kCGImagePropertyGIFDictionary: [
-                kCGImagePropertyGIFDelayTime: delayTime,
-                kCGImagePropertyGIFLoopCount: 0
-              ]
-            ] as CFDictionary
-          } else {
-            return [
-              kCGImagePropertyGIFDictionary: [
-                kCGImagePropertyGIFDelayTime: delayTime
-              ]
-            ] as CFDictionary
-          }
-        }()
+        // Frame properties only need delay time
+        let frameProps: CFDictionary = [
+          kCGImagePropertyGIFDictionary: [
+            kCGImagePropertyGIFDelayTime: delayTime
+          ]
+        ] as CFDictionary
 
         CGImageDestinationAddImage(destination, cgImage, frameProps)
       }
-
-      CGImageDestinationSetProperties(destination, gifProperties)
 
       if CGImageDestinationFinalize(destination) {
         let base64EncodedGif = data.base64EncodedString()
