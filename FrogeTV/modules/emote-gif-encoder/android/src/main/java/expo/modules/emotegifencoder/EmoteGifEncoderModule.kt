@@ -33,8 +33,8 @@ class EmoteGifEncoderModule : Module() {
         val gifEncoder = GifEncoder(outputStream, bitmaps[0].width, bitmaps[0].height, 0)
 
         for (i in bitmaps.indices) {
+          gifEncoder.setDelay(durations[i]) // delay first
           gifEncoder.addFrame(bitmaps[i])
-          gifEncoder.setDelay(durations[i])
         }
 
         gifEncoder.finishEncoding()
