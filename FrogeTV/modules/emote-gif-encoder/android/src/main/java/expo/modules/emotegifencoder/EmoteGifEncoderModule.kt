@@ -1,50 +1,56 @@
 package expo.modules.emotegifencoder
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.net.URL
+import expo.modules.kotlin.promise.Promise
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import android.util.Base64
+import pl.droidsonroids.gif.GifEncoder
+import java.io.OutputStream
 
 class EmoteGifEncoderModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
   override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('EmoteGifEncoder')` in JavaScript.
     Name("EmoteGifEncoder")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants(
-      "PI" to Math.PI
-    )
+    Constants("PI" to Math.PI)
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+    AsyncFunction("encodeGif") { frames: List<String>, durations: List<Int>, promise: Promise ->
+      try {
+        if (frames.size != durations.size) {
+          promise.reject("MISMATCH", "Number of frames and durations must match.")
+          return@AsyncFunction
+        }
 
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
-    }
+        // Decode base64 images into Bitmaps
+        val bitmaps = frames.map { base64 ->
+          val decodedBytes = Base64.decode(base64, Base64.DEFAULT)
+          BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
-    }
+        // Create output GIF file
+        val outputDir = appContext.reactContext?.cacheDir ?: File("/tmp")
+        val outputFile = File.createTempFile("emote_", ".gif", outputDir)
+        val outputStream: OutputStream = FileOutputStream(outputFile)
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(EmoteGifEncoderView::class) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { view: EmoteGifEncoderView, url: URL ->
-        view.webView.loadUrl(url.toString())
+        val gifEncoder = GifEncoder(outputStream, bitmaps[0].width, bitmaps[0].height, 0)
+
+        for (i in bitmaps.indices) {
+          gifEncoder.addFrame(bitmaps[i])
+          gifEncoder.setDelay(durations[i])
+        }
+
+        gifEncoder.finishEncoding()
+        outputStream.flush()
+        outputStream.close()
+
+        promise.resolve(outputFile.absolutePath)
+      } catch (e: Exception) {
+        promise.reject("ENCODE_ERROR", e.message ?: "Failed to encode GIF")
       }
-      // Defines an event that the view can send to JavaScript.
-      Events("onLoad")
     }
   }
 }
