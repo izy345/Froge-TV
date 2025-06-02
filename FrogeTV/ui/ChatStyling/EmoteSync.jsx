@@ -3,12 +3,14 @@ import { View, StyleSheet } from "react-native";
 import { Canvas, Image, useAnimatedImage } from "@shopify/react-native-skia";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
+import EmoteGifEncoderModule from "../../modules/emote-gif-encoder/src/EmoteGifEncoderModule";
 
 const animationStartTime = Date.now();
 
 // Upcoming plans: Use native module to construct into a gif or webp to help with performance
 export default function EmoteSync({ emoteId, source, style }) {
     const dispatch = useDispatch();
+
 
     //const flattenedStyle = StyleSheet.flatten(style) || {};
     const width = style.width ?? 32;
