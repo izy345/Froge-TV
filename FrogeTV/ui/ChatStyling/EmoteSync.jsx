@@ -5,6 +5,7 @@ import {
     Image,
     useAnimatedImage,
     useImage,
+    useAnimatedImageValue,
 } from "@shopify/react-native-skia";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
@@ -24,7 +25,10 @@ export default function EmoteSync({ emoteId, source, style }) {
     const cachedEmote = useSelector(getEmoteData(emoteId));
 
     const [gifUri, setGifUri] = useState(null);
-    const skiaImage = useImage(gifUri || "");
+    const skiaImage = useAnimatedImageValue(
+        gifUri
+    );
+
 
     useEffect(() => {
         if (!animatedImage || cachedEmote) return;
@@ -88,7 +92,7 @@ export default function EmoteSync({ emoteId, source, style }) {
         
         EmoteGifEncoderModule.encodeGif(reorderedFrames, reorderedDurations)
             .then((path) => {
-                console.log(`data:image/gif;base64,${path}`);
+                //console.log(`data:image/gif;base64,${path}`);
                 setGifUri(`data:image/gif;base64,${path}`);
             })
             .catch(console.warn);

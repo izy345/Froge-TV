@@ -1,0 +1,2 @@
+/Users/israelgutierrez/Desktop/Projects/FrogeTV/FrogeTV/modules/emote-gif-encoder/android/src/main/java/expo/modules/emotegifencoder/EmoteGifEncoderModule.kt
+/Users/israelgutierrez/Desktop/Projects/FrogeTV/FrogeTV/modules/emote-gif-encoder/android/src/main/java/expo/modules/emotegifencoder/EmoteGifEncoderView.kt

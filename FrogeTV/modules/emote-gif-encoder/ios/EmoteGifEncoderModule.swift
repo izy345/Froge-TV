@@ -14,6 +14,7 @@ public class EmoteGifEncoderModule: Module {
         throw NSError(domain: "EmoteGifEncoder", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create GIF destination"])
       }
 
+      // Global GIF properties
       let gifProperties = [
         kCGImagePropertyGIFDictionary: [
           kCGImagePropertyGIFLoopCount: 0
@@ -28,11 +29,24 @@ public class EmoteGifEncoderModule: Module {
         }
 
         let delayTime = durations[index] / 1000.0
-        let frameProps = [
-          kCGImagePropertyGIFDictionary: [
-            kCGImagePropertyGIFDelayTime: delayTime
-          ]
-        ] as CFDictionary
+
+        // Apply loop count to the first frame as well (important for proper looping)
+        let frameProps: CFDictionary = {
+          if index == 0 {
+            return [
+              kCGImagePropertyGIFDictionary: [
+                kCGImagePropertyGIFDelayTime: delayTime,
+                kCGImagePropertyGIFLoopCount: 0
+              ]
+            ] as CFDictionary
+          } else {
+            return [
+              kCGImagePropertyGIFDictionary: [
+                kCGImagePropertyGIFDelayTime: delayTime
+              ]
+            ] as CFDictionary
+          }
+        }()
 
         CGImageDestinationAddImage(destination, cgImage, frameProps)
       }

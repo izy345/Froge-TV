@@ -97,7 +97,7 @@ function ChatStyling({
                 <EmoteRenderer
                     style={[styles.chatText, deleted.del && styles.chatTextDeleted]}
                     enforceTwitchEmotePolicy
-                    message={chatMsg}
+                    message={'yo '}
                     emotes={emotes}
                     twitchGivenEmoteList={allowedEmotes}
                     attemptEmoteSync={attemptEmoteSync}
