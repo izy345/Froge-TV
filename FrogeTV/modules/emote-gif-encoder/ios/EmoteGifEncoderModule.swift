@@ -1,48 +1,50 @@
 import ExpoModulesCore
+import UIKit
+import ImageIO
+import MobileCoreServices
 
 public class EmoteGifEncoderModule: Module {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
   public func definition() -> ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('EmoteGifEncoder')` in JavaScript.
     Name("EmoteGifEncoder")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants([
-      "PI": Double.pi
-    ])
+    AsyncFunction("encodeGif") { (base64Frames: [String], durations: [Double]) -> String in
+      let data = NSMutableData()
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
-
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      return "Hello world! 👋"
-    }
-
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { (value: String) in
-      // Send an event to JavaScript.
-      self.sendEvent("onChange", [
-        "value": value
-      ])
-    }
-
-    // Enables the module to be used as a native view. Definition components that are accepted as part of the
-    // view definition: Prop, Events.
-    View(EmoteGifEncoderView.self) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { (view: EmoteGifEncoderView, url: URL) in
-        if view.webView.url != url {
-          view.webView.load(URLRequest(url: url))
-        }
+      guard let destination = CGImageDestinationCreateWithData(data as CFMutableData, kUTTypeGIF, base64Frames.count, nil) else {
+        throw NSError(domain: "EmoteGifEncoder", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create GIF destination"])
       }
 
-      Events("onLoad")
+      let gifProperties = [
+        kCGImagePropertyGIFDictionary: [
+          kCGImagePropertyGIFLoopCount: 0
+        ]
+      ] as CFDictionary
+
+      for (index, base64String) in base64Frames.enumerated() {
+        guard let imageData = Data(base64Encoded: base64String),
+              let image = UIImage(data: imageData),
+              let cgImage = image.cgImage else {
+          continue
+        }
+
+        let delayTime = durations[index] / 1000.0
+        let frameProps = [
+          kCGImagePropertyGIFDictionary: [
+            kCGImagePropertyGIFDelayTime: delayTime
+          ]
+        ] as CFDictionary
+
+        CGImageDestinationAddImage(destination, cgImage, frameProps)
+      }
+
+      CGImageDestinationSetProperties(destination, gifProperties)
+
+      if CGImageDestinationFinalize(destination) {
+        let base64EncodedGif = data.base64EncodedString()
+        return base64EncodedGif
+      } else {
+        throw NSError(domain: "EmoteGifEncoder", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to finalize GIF"])
+      }
     }
   }
 }

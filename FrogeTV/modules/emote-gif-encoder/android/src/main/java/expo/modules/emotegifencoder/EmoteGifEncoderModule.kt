@@ -5,12 +5,9 @@ import android.graphics.BitmapFactory
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.promise.Promise
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import android.util.Base64
 import pl.droidsonroids.gif.GifEncoder
-import java.io.OutputStream
+import java.io.ByteArrayOutputStream
 
 class EmoteGifEncoderModule : Module() {
   override fun definition() = ModuleDefinition {
@@ -31,11 +28,8 @@ class EmoteGifEncoderModule : Module() {
           BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
         }
 
-        // Create output GIF file
-        val outputDir = appContext.reactContext?.cacheDir ?: File("/tmp")
-        val outputFile = File.createTempFile("emote_", ".gif", outputDir)
-        val outputStream: OutputStream = FileOutputStream(outputFile)
-
+        // Use in-memory output stream instead of file
+        val outputStream = ByteArrayOutputStream()
         val gifEncoder = GifEncoder(outputStream, bitmaps[0].width, bitmaps[0].height, 0)
 
         for (i in bitmaps.indices) {
@@ -45,9 +39,13 @@ class EmoteGifEncoderModule : Module() {
 
         gifEncoder.finishEncoding()
         outputStream.flush()
+
+        // Convert to Base64 and return
+        val gifBytes = outputStream.toByteArray()
+        val base64Gif = Base64.encodeToString(gifBytes, Base64.NO_WRAP)
         outputStream.close()
 
-        promise.resolve(outputFile.absolutePath)
+        promise.resolve(base64Gif)
       } catch (e: Exception) {
         promise.reject("ENCODE_ERROR", e.message ?: "Failed to encode GIF")
       }
