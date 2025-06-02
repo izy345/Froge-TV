@@ -42,6 +42,7 @@ const cacheSlice = createSlice({
                 totalDuration,
                 frameCount,
                 frames,
+                base64Frames,
             } = action.payload || {};
         
             if (!emoteId || !emoteUrl) throw new Error("Invalid emote cache payload");
@@ -61,6 +62,7 @@ const cacheSlice = createSlice({
                 totalDuration,
                 frameCount,
                 frames,
+                base64Frames,
             });
         },
         setEmoteCache(state, action) {
