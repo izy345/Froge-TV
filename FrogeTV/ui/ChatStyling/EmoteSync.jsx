@@ -92,7 +92,8 @@ export default function EmoteSync({ emoteId, source, style }) {
         
         EmoteGifEncoderModule.encodeGif(reorderedFrames, reorderedDurations)
             .then((path) => {
-                //console.log('cachedEmote', cachedEmote);
+                console.log('cachedEmote', cachedEmote);
+                console.log(`data:image/gif;base64,${path}`)
                 setGifUri(`data:image/gif;base64,${path}`);
             })
             .catch(console.warn);
