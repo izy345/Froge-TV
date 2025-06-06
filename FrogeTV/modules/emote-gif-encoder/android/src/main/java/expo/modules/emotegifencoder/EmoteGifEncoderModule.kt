@@ -1,81 +1,81 @@
 package expo.modules.emotegifencoder
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Handler
+import android.os.Looper
 import android.util.Base64
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import com.squareup.gifencoder.GifEncoder
-import com.squareup.gifencoder.ImageOptions
-import java.io.ByteArrayOutputStream
-import java.util.concurrent.TimeUnit
+import com.waynejo.androidndkgif.GifEncoder
+import java.io.File
+import kotlin.concurrent.thread
 
-class EmoteGifEncoderModule : Module() {
+class EmoteGifEncoderModule : Module() {              // remove the AppContext constructor
   override fun definition() = ModuleDefinition {
     Name("EmoteGifEncoder")
 
-    Constants("PI" to Math.PI)
-
     AsyncFunction("encodeGif") { frames: List<String>, durations: List<Int>, promise: Promise ->
-      try {
-        if (frames.size != durations.size) {
-          promise.reject("MISMATCH", "Number of frames and durations must match.", null)
-          return@AsyncFunction
+      if (frames.size != durations.size) {
+        promise.reject("MISMATCH", "Number of frames and durations must match.", null)
+        return@AsyncFunction
+      }
+
+      thread {
+        try {
+          // decode Base64 → Bitmaps
+          val bitmaps = frames.mapIndexed { i, b64 ->
+            Base64.decode(b64, Base64.DEFAULT).let { bytes ->
+              BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                ?: throw IllegalArgumentException("Invalid image at index $i")
+            }
+          }
+
+          // use the inherited appContext to get cacheDir
+          val reactContext = appContext.reactContext
+          if (reactContext == null) {
+            runOnUiThread {
+              promise.reject("NO_CONTEXT", "React context is not available", null)
+            }
+            return@thread
+          }
+
+          val tempGif = File(reactContext.cacheDir, "emotegif_${System.currentTimeMillis()}.gif")
+
+
+          // init native GifEncoder
+          val encoder = GifEncoder().apply {
+            init(
+              bitmaps[0].width,
+              bitmaps[0].height,
+              tempGif.absolutePath,
+              GifEncoder.EncodingType.ENCODING_TYPE_SIMPLE_FAST
+            )
+          }
+
+          // add frames + delays
+          bitmaps.forEachIndexed { i, bmp ->
+            if (!encoder.encodeFrame(bmp, durations[i])) {
+              throw RuntimeException("Failed to encode frame $i")
+            }
+          }
+          encoder.close()
+
+          // read bytes, delete file, Base64 encode
+          val gifBytes = tempGif.readBytes()
+          tempGif.delete()
+          val result = Base64.encodeToString(gifBytes, Base64.NO_WRAP)
+
+          // resolve on UI thread
+          runOnUiThread { promise.resolve(result) }
+        } catch (e: Exception) {
+          runOnUiThread { promise.reject("ENCODE_ERROR", e.message, e) }
         }
-
-        // Decode base64 images into Bitmaps
-        val bitmaps = frames.map { base64 ->
-          val decodedBytes = Base64.decode(base64, Base64.DEFAULT)
-          BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-        }
-
-        // Setup GIF encoder
-        val outputStream = ByteArrayOutputStream()
-        val width = bitmaps[0].width
-        val height = bitmaps[0].height
-        val gifEncoder = GifEncoder(outputStream, width, height, 0)
-
-        for (i in bitmaps.indices) {
-          val bitmap = bitmaps[i]
-          val rgbArray = bitmapToRgbArray(bitmap)
-          val options = ImageOptions()
-          options.setDelay(durations[i].toLong(), TimeUnit.MILLISECONDS)
-          gifEncoder.addImage(rgbArray, options)
-        }
-
-        gifEncoder.finishEncoding()
-        outputStream.flush()
-
-        // Convert to Base64 and return
-        val gifBytes = outputStream.toByteArray()
-        val base64Gif = Base64.encodeToString(gifBytes, Base64.NO_WRAP)
-        outputStream.close()
-
-        promise.resolve(base64Gif)
-      } catch (e: Exception) {
-        promise.reject("ENCODE_ERROR", e.message ?: "Failed to encode GIF", e)
       }
     }
   }
 
-  // Helper function to convert Bitmap to 2D RGB array
-  private fun bitmapToRgbArray(bitmap: Bitmap): Array<IntArray> {
-    val width = bitmap.width
-    val height = bitmap.height
-    val pixels = IntArray(width * height)
-    bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
-
-    val rgbArray = Array(height) { IntArray(width) }
-    for (y in 0 until height) {
-      for (x in 0 until width) {
-        val pixel = pixels[y * width + x]
-        val r = (pixel shr 16) and 0xFF
-        val g = (pixel shr 8) and 0xFF
-        val b = pixel and 0xFF
-        rgbArray[y][x] = (r shl 16) or (g shl 8) or b
-      }
-    }
-    return rgbArray
+  private fun runOnUiThread(action: () -> Unit) {
+    Handler(Looper.getMainLooper()).post { action() }
   }
 }

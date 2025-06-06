@@ -47,5 +47,18 @@ repositories {
 
 dependencies {
   implementation project(':expo-modules-core')
-  implementation("com.squareup:gifencoder:0.10.1")
+  //implementation("com.squareup:gifencoder:0.10.1")
+  implementation ('io.github.waynejo:androidndkgif:1.0.1')
 }
+/*
+repositories {
+  google()
+  mavenCentral() // Required
+  maven { url 'https://repo1.maven.org/maven2' }
+}
+
+dependencies {
+  implementation project(':expo-modules-core')
+  implementation ('io.github.waynejo:androidndkgif:1.0.1')
+}
+*/
