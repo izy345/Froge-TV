@@ -1,5 +1,6 @@
 package expo.modules.emotegifencoder
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.Looper
@@ -11,7 +12,7 @@ import com.waynejo.androidndkgif.GifEncoder
 import java.io.File
 import kotlin.concurrent.thread
 
-class EmoteGifEncoderModule : Module() {              // remove the AppContext constructor
+class EmoteGifEncoderModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("EmoteGifEncoder")
 
@@ -23,15 +24,15 @@ class EmoteGifEncoderModule : Module() {              // remove the AppContext c
 
       thread {
         try {
-          // decode Base64 → Bitmaps
           val bitmaps = frames.mapIndexed { i, b64 ->
-            Base64.decode(b64, Base64.DEFAULT).let { bytes ->
-              BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                ?: throw IllegalArgumentException("Invalid image at index $i")
-            }
+            val bytes = Base64.decode(b64, Base64.DEFAULT)
+            val decoded = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+              ?: throw IllegalArgumentException("Invalid image at index $i")
+
+            // Ensure bitmap supports alpha
+            decoded.copy(Bitmap.Config.ARGB_8888, false)
           }
 
-          // use the inherited appContext to get cacheDir
           val reactContext = appContext.reactContext
           if (reactContext == null) {
             runOnUiThread {
@@ -42,8 +43,6 @@ class EmoteGifEncoderModule : Module() {              // remove the AppContext c
 
           val tempGif = File(reactContext.cacheDir, "emotegif_${System.currentTimeMillis()}.gif")
 
-
-          // init native GifEncoder
           val encoder = GifEncoder().apply {
             init(
               bitmaps[0].width,
@@ -53,7 +52,6 @@ class EmoteGifEncoderModule : Module() {              // remove the AppContext c
             )
           }
 
-          // add frames + delays
           bitmaps.forEachIndexed { i, bmp ->
             if (!encoder.encodeFrame(bmp, durations[i])) {
               throw RuntimeException("Failed to encode frame $i")
@@ -61,12 +59,10 @@ class EmoteGifEncoderModule : Module() {              // remove the AppContext c
           }
           encoder.close()
 
-          // read bytes, delete file, Base64 encode
           val gifBytes = tempGif.readBytes()
           tempGif.delete()
           val result = Base64.encodeToString(gifBytes, Base64.NO_WRAP)
 
-          // resolve on UI thread
           runOnUiThread { promise.resolve(result) }
         } catch (e: Exception) {
           runOnUiThread { promise.reject("ENCODE_ERROR", e.message, e) }

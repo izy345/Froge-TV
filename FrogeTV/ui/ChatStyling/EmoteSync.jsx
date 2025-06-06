@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { View, StyleSheet, Alert } from "react-native";
+import { View, StyleSheet, Alert, Image as RNImage, Platform  } from "react-native";
 import {
     Canvas,
     Image,
@@ -92,8 +92,8 @@ export default function EmoteSync({ emoteId, source, style }) {
         
         EmoteGifEncoderModule.encodeGif(reorderedFrames, reorderedDurations)
             .then((path) => {
-                console.log('cachedEmote', cachedEmote);
-                console.log(`data:image/gif;base64,${path}`)
+                //console.log('cachedEmote', cachedEmote);
+                //console.log(`data:image/gif;base64,${path}`)
                 setGifUri(`data:image/gif;base64,${path}`);
             })
             .catch(console.warn);
@@ -103,18 +103,28 @@ export default function EmoteSync({ emoteId, source, style }) {
         return <View style={[styles.placeholder, { width, height }]} />;
     }
 
-    return (
-        <Canvas style={[{ width, height }, style]}>
-            <Image
-                image={skiaImage}
-                x={0}
-                y={0}
-                width={width}
-                height={height}
-                fit="contain"
+    if (Platform.OS === 'ios'){
+        return (
+            <Canvas style={[{ width, height }, style]}>
+                <Image
+                    image={skiaImage}
+                    x={0}
+                    y={0}
+                    width={width}
+                    height={height}
+                    fit="contain"
+                />
+            </Canvas>
+        );
+    } else{
+        return (
+            <RNImage
+                source={{ uri: gifUri }}
+                style={[{ width, height }, style]}
+                resizeMode="contain"
             />
-        </Canvas>
-    );
+        );
+    }
 }
 
 const styles = StyleSheet.create({
