@@ -8,26 +8,26 @@ import { configSliceActions } from '../../store/Configuration/config-slice';
 
 // CURRENTLY UNUSED, BUT MAY BE USED IN THE FUTURE
 // This component allows users to adjust the maximum number of SyncEmotes cached in memory.
-function EmoteCacheSize() {
+function EmoteForgiveAmount() {
     const dispatch = useDispatch();
-    const maxEmoteCacheSize = useSelector((state) => state.config.maxEmoteCacheSize) || 250;
+    const forgiveCacheIndex = useSelector((state) => state.config.forgiveCacheIndex) || 2;
 
     const handleSlidingComplete = (value) => {
-        dispatch(configSliceActions.setMaxEmoteCacheSize(value)); // Update Redux state when sliding is complete
+        dispatch(configSliceActions.setForgiveCacheIndex(value)); // Update Redux state when sliding is complete
     };
 
     return (
         <View style={commonStyles.settingsContainer}>
             <View style={styles.settingsRow}>
-                <Text style={styles.subText}>Cache Anime Emotes Amount</Text>
+                <Text style={styles.subText}>Diverge Requirement</Text>
             </View>
             <View style={styles.sliderContainer}>
                 <Slider
                     style={styles.slider}
-                    minimumValue={100}
-                    maximumValue={2000}
-                    step={100}
-                    value={maxEmoteCacheSize}
+                    minimumValue={0}
+                    maximumValue={5}
+                    step={1}
+                    value={forgiveCacheIndex}
                     onSlidingComplete={handleSlidingComplete} // Update Redux state
                     minimumTrackTintColor={Colors.twitchPurple1000}
                     maximumTrackTintColor={Colors.twitchWhite1000}
@@ -36,21 +36,22 @@ function EmoteCacheSize() {
                 <TextInput
                     style={styles.textInput}
                     keyboardType="numeric"
-                    value={maxEmoteCacheSize.toString()}
+                    value={forgiveCacheIndex.toString()}
                     editable={false}
                 />
             </View>
             <View>
                 <Text style={commonStyles.settingsText}>
-                    If Sync Emotes is enabled, this will adjust the max number of emotes that are temporarily stored in memory.
-                    Adjust this to avoid excessive memory usage or unforeseen crashes.
+                    If Sync Emotes is enabled, this will determine how far the playback (frames) need to diverge before the emote is encoded and cached.
+                    Increase for less frequent cache and encoding updates, decrease for more responsiveness.
+                    For a general rule, the higher the number, the less frequent your device will be required to cache and encode at the cost of emotes being less synchronization.
                 </Text>
             </View>
         </View>
     );
 }
 
-export default EmoteCacheSize;
+export default EmoteForgiveAmount;
 
 const styles = StyleSheet.create({
     subText: {

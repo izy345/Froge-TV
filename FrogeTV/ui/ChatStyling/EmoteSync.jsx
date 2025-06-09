@@ -23,6 +23,8 @@ export default function EmoteSync({ emoteId, source, style }) {
     const animatedImage = useAnimatedImage(memoizedSource);
 
     const cachedEmote = useSelector(getEmoteData(emoteId));
+    const maxEmoteCacheSize = useSelector((state) => state.config.maxEmoteCacheSize)
+    const forgiveCacheIndex = useSelector((state) => state.config.forgiveCacheIndex) 
 
     const [gifUri, setGifUri] = useState(null);
     const skiaImage = useAnimatedImageValue(
@@ -95,8 +97,8 @@ export default function EmoteSync({ emoteId, source, style }) {
             base64Frames: reorderedFrames,
             frameDurations: reorderedDurations,
             totalNumberOfFrames: cachedEmote.frameCount,
-            maxCacheSize: 1000,
-            forgive: 0,
+            maxCacheSize: maxEmoteCacheSize,
+            forgive: forgiveCacheIndex,
         })).then(({ base64 }) => {
                 setGifUri(base64);
             })

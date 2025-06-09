@@ -10,7 +10,8 @@ import ChatShowFFZEmotes from './ChatShowFFZEmotes'
 import ChatShow7TVEmotes from './ChatShow7TVEmotes'
 import VersionInfo from './VersionInfo'
 import SyncEmote from './SyncEmotes'
-//import EmoteCacheSize from './EmoteCacheSize'
+import EmoteCacheSize from './EmoteCacheSize'
+import EmoteForgiveAmount from './EmoteForgiveAmount'
 
 function SettingsRender() {
     return (
@@ -25,6 +26,8 @@ function SettingsRender() {
         <ChatShow7TVEmotes />
         <Text style={styles.boldText}> Experimental</Text>
         <SyncEmote />
+        <EmoteCacheSize />
+        <EmoteForgiveAmount />
         <VersionInfo />
     </ScrollView>
     )

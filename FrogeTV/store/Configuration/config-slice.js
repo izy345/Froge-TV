@@ -4,12 +4,13 @@ import { Dimensions } from "react-native";
 const configSlice = createSlice({
     name: 'configSlice',
     initialState: {
-        chatScrollAnimationIsActive: false,
+        chatScrollAnimationIsActive: false, // if true, chat will scroll to the bottom with slight animation when new messages arrive. Disables some optimizations.
         includeAtOnReplies: true, // likely to never be used 
         hideDeletedMessages: false,
-        msgsDelay: 0,
-        attemptEmoteSync: false,
-        maxEmoteCacheSize: 250,
+        msgsDelay: 0, // unused, perhaps for future use
+        attemptEmoteSync: false, // sync emote playback
+        maxEmoteCacheSize: 1000, // max emotes in cache (this affects animated emotes only)
+        forgiveCacheIndex: 2, // if index playback is withing this amount, reuse the emote already in cache, skipping the GIF encoding process.
         // badges
         showBTTVBadges: true,
         showFFZBadges: true,
@@ -41,6 +42,9 @@ const configSlice = createSlice({
         },
         setMaxEmoteCacheSize(state, action) {
             state.maxEmoteCacheSize = action.payload;
+        },
+        setForgiveCacheIndex(state, action) {
+            state.forgiveCacheIndex = action.payload;
         },
         // ExploreHistory saved
         setExploreHistory(state, action) {

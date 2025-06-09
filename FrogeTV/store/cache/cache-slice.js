@@ -105,52 +105,65 @@ export const maybeEncodeAndAppendAnimationCache =
         totalNumberOfFrames,
         maxCacheSize = 1000,
         forgive = 0,
-    }) => async (dispatch, getState) =>
-    {
+    }) => async (dispatch, getState) => {
     const animationCache = getState().cache.animationCache;
     let newCache = [...animationCache];
-    
-    let emoteEntry = newCache.find(e => e.emoteUrl === emoteUrl);
-    
-    if (!emoteEntry) {
+
+    // Find index and entry for emote
+    let emoteEntryIndex = newCache.findIndex(e => e.emoteUrl === emoteUrl);
+    let emoteEntry;
+
+    if (emoteEntryIndex === -1) {
         emoteEntry = {
-        emoteUrl,
-        totalFrames: totalNumberOfFrames,
-        lastUsed: Date.now(),
-        frames: [],
+            emoteUrl,
+            totalFrames: totalNumberOfFrames,
+            lastUsed: Date.now(),
+            frames: [],
         };
         newCache.unshift(emoteEntry);
     } else {
+        // Clone to safely mutate
+        emoteEntry = { ...newCache[emoteEntryIndex] };
         emoteEntry.lastUsed = Date.now();
-        newCache = [emoteEntry, ...newCache.filter(e => e !== emoteEntry)];
+
+        // Clone frames array to safely mutate
+        emoteEntry.frames = [...emoteEntry.frames];
+
+        // Remove old frozen object, insert new mutable copy at front for LRU
+        newCache.splice(emoteEntryIndex, 1);
+        newCache.unshift(emoteEntry);
     }
 
-    // Find matching frame
+    // Find exact or forgiving match by timeIndex
     let matchFrameIndex = emoteEntry.frames.findIndex(f => f.timeIndex === timeIndex);
 
     if (matchFrameIndex === -1 && forgive > 0) {
         for (let offset = -forgive; offset <= forgive; offset++) {
-        const forgivingIndex = mod(timeIndex + offset, totalNumberOfFrames);
-        matchFrameIndex = emoteEntry.frames.findIndex(f => f.timeIndex === forgivingIndex);
-        if (matchFrameIndex !== -1) break;
+            const forgivingIndex = mod(timeIndex + offset, totalNumberOfFrames);
+            matchFrameIndex = emoteEntry.frames.findIndex(f => f.timeIndex === forgivingIndex);
+            if (matchFrameIndex !== -1) break;
         }
     }
 
     if (matchFrameIndex !== -1) {
-        // Move frame to front and return cached base64
+        // Cache hit: Move frame to front and return cached base64
         const matchFrame = emoteEntry.frames.splice(matchFrameIndex, 1)[0];
         emoteEntry.frames.unshift(matchFrame);
+        //console.log(`Found cached frame for emote ${emoteUrl} at timeIndex ${timeIndex}`);
+        dispatch(cacheSliceActions.setAnimationCache(newCache));  // Dispatch updated cache
         return { updatedCache: newCache, base64: matchFrame.base64 };
     }
 
-    // NOT FOUND: encode entire emote to GIF base64 using native module
+    // Cache miss: encode entire emote to GIF base64 using native module
+    
+    //console.log(`No cached frame found for emote ${emoteUrl} at timeIndex ${timeIndex}`);
     const encodedBase64 = await EmoteGifEncoderModule.encodeGif(base64Frames, frameDurations);
     const base64 = `data:image/gif;base64,${encodedBase64}`;
 
-    // Add new frame using encoded base64, NOT the original base64Frames[timeIndex]
+    // Add new encoded frame (timeIndex, base64)
     emoteEntry.frames.unshift({ timeIndex, base64 });
 
-    // Prune cache
+    // Prune cache by total frames count
     const getWeight = e => e.totalFrames;
     let totalWeight = newCache.reduce((sum, e) => sum + getWeight(e), 0);
 
@@ -159,8 +172,13 @@ export const maybeEncodeAndAppendAnimationCache =
         totalWeight -= getWeight(oldest);
     }
 
+    dispatch(cacheSliceActions.setAnimationCache(newCache));  // Dispatch updated cache
+
     return { updatedCache: newCache, base64 };
-}
+};
+
+
+
 
 
 export const cacheSliceActions = cacheSlice.actions;

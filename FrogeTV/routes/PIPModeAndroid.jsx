@@ -29,7 +29,7 @@ function PIPModeAndroid() {
             (function() {
                 // existing style injection logic
                 var style = document.createElement('style');
-                style.innerHTML = '.ScCoreButton-sc-ocjdkq-0.gFvFah, .ScCoreButton-sc-ocjdkq-0.yKpkn, .Layout-sc-1xcs6mc-0.iXkPaN.top-bar, .InjectLayout-sc-1i43xsx-0.hWukFy.tw-transition-group { display: none !important; }';
+                style.innerHTML = '.ScCoreButton-sc-ocjdkq-0.gFvFah, .ScCoreButton-sc-ocjdkq-0.yKpkn, .Layout-sc-1xcs6mc-0.dquNzJ.top-bar, .InjectLayout-sc-1i43xsx-0.hWukFy.tw-transition-group { display: none !important; }';
                 document.head.appendChild(style);
 
                 // Disable all anchor clicks
