@@ -19,14 +19,14 @@ function EmoteCacheSize() {
     return (
         <View style={commonStyles.settingsContainer}>
             <View style={styles.settingsRow}>
-                <Text style={styles.subText}>Cache Number of Emotes</Text>
+                <Text style={styles.subText}>Cache Anime Emotes Amount</Text>
             </View>
             <View style={styles.sliderContainer}>
                 <Slider
                     style={styles.slider}
-                    minimumValue={50}
-                    maximumValue={500}
-                    step={50}
+                    minimumValue={100}
+                    maximumValue={2000}
+                    step={100}
                     value={maxEmoteCacheSize}
                     onSlidingComplete={handleSlidingComplete} // Update Redux state
                     minimumTrackTintColor={Colors.twitchPurple1000}

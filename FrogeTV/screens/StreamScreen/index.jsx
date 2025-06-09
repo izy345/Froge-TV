@@ -13,6 +13,7 @@ import { emoteDetailsModalSliceActions } from "../../store/EmoteDetailsModal/emo
 import { useIsFocused } from "@react-navigation/native";
 import { chatInputSliceActions } from "../../store/ChatInput/chatInput-slice";
 import { __DEV__ } from "react-native";
+import { cacheSliceActions } from "../../store/cache/cache-slice";
 
 function StreamScreen({ route, navigation }) {
 
@@ -53,6 +54,7 @@ function StreamScreen({ route, navigation }) {
             dispatch(chatInputSliceActions.setChatInput(''))
             dispatch(chatInputSliceActions.setReplyingTo(null))
             dispatch(chatInputSliceActions.setShowEmoteList(false))
+            dispatch(cacheSliceActions.setAnimationCache([]))
         }
     },[])
 

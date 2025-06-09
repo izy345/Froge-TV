@@ -1,0 +1,64 @@
+apply plugin: 'com.android.library'
+
+group = 'expo.modules.emotegifencoder'
+version = '0.6.3'
+
+// Load Expo Modules Core Plugin
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+def useManagedAndroidSdkVersions = false
+if (useManagedAndroidSdkVersions) {
+  useDefaultAndroidSdkVersions()
+} else {
+  buildscript {
+    ext.safeExtGet = { prop, fallback ->
+      rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+  }
+  project.android {
+    compileSdkVersion safeExtGet("compileSdkVersion", 34)
+    defaultConfig {
+      minSdkVersion safeExtGet("minSdkVersion", 21)
+      targetSdkVersion safeExtGet("targetSdkVersion", 34)
+    }
+  }
+}
+
+android {
+  namespace "expo.modules.emotegifencoder"
+  defaultConfig {
+    versionCode 1
+    versionName "0.6.3"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+repositories {
+  google()
+  mavenCentral() // Required
+  maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+  implementation project(':expo-modules-core')
+  //implementation("com.squareup:gifencoder:0.10.1")
+  implementation ('io.github.waynejo:androidndkgif:1.0.1')
+}
+/*
+repositories {
+  google()
+  mavenCentral() // Required
+  maven { url 'https://repo1.maven.org/maven2' }
+}
+
+dependencies {
+  implementation project(':expo-modules-core')
+  implementation ('io.github.waynejo:androidndkgif:1.0.1')
+}
+*/
