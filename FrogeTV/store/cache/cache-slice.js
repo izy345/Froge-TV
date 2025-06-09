@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import EmoteGifEncoderModule from "../../modules/emote-gif-encoder/src/EmoteGifEncoderModule";
 
 
 const cacheSlice = createSlice({
@@ -8,6 +8,7 @@ const cacheSlice = createSlice({
         categoryCache: [],
         streamCardCache: [],
         emoteCache: [],
+        animationCache: []
 
     },
     reducers: {
@@ -68,6 +69,11 @@ const cacheSlice = createSlice({
         setEmoteCache(state, action) {
             state.emoteCache = action.payload;
         },
+        // animated cache
+        setAnimationCache(state, action) {
+            state.animationCache = action.payload;
+        },
+
     }
 });
 
@@ -85,6 +91,77 @@ export const getStreamCardURL = (streamId) => (state) => {
 // get emote data by emoteURL
 export const getEmoteData = (emoteId) => (state) =>
     state.cache.emoteCache.find((e) => e.emoteId === emoteId) ?? null;
+
+// set and/or get animation cache 
+// helper mod function
+const mod = (n, m) => ((n % m) + m) % m;
+
+export const maybeEncodeAndAppendAnimationCache = 
+    ({
+        emoteUrl,
+        timeIndex,
+        base64Frames,
+        frameDurations,
+        totalNumberOfFrames,
+        maxCacheSize = 1000,
+        forgive = 0,
+    }) => async (dispatch, getState) =>
+    {
+    const animationCache = getState().cache.animationCache;
+    let newCache = [...animationCache];
+    
+    let emoteEntry = newCache.find(e => e.emoteUrl === emoteUrl);
+    
+    if (!emoteEntry) {
+        emoteEntry = {
+        emoteUrl,
+        totalFrames: totalNumberOfFrames,
+        lastUsed: Date.now(),
+        frames: [],
+        };
+        newCache.unshift(emoteEntry);
+    } else {
+        emoteEntry.lastUsed = Date.now();
+        newCache = [emoteEntry, ...newCache.filter(e => e !== emoteEntry)];
+    }
+
+    // Find matching frame
+    let matchFrameIndex = emoteEntry.frames.findIndex(f => f.timeIndex === timeIndex);
+
+    if (matchFrameIndex === -1 && forgive > 0) {
+        for (let offset = -forgive; offset <= forgive; offset++) {
+        const forgivingIndex = mod(timeIndex + offset, totalNumberOfFrames);
+        matchFrameIndex = emoteEntry.frames.findIndex(f => f.timeIndex === forgivingIndex);
+        if (matchFrameIndex !== -1) break;
+        }
+    }
+
+    if (matchFrameIndex !== -1) {
+        // Move frame to front and return cached base64
+        const matchFrame = emoteEntry.frames.splice(matchFrameIndex, 1)[0];
+        emoteEntry.frames.unshift(matchFrame);
+        return { updatedCache: newCache, base64: matchFrame.base64 };
+    }
+
+    // NOT FOUND: encode entire emote to GIF base64 using native module
+    const encodedBase64 = await EmoteGifEncoderModule.encodeGif(base64Frames, frameDurations);
+    const base64 = `data:image/gif;base64,${encodedBase64}`;
+
+    // Add new frame using encoded base64, NOT the original base64Frames[timeIndex]
+    emoteEntry.frames.unshift({ timeIndex, base64 });
+
+    // Prune cache
+    const getWeight = e => e.totalFrames;
+    let totalWeight = newCache.reduce((sum, e) => sum + getWeight(e), 0);
+
+    while (totalWeight > maxCacheSize * 30) {
+        const oldest = newCache.pop();
+        totalWeight -= getWeight(oldest);
+    }
+
+    return { updatedCache: newCache, base64 };
+}
+
 
 export const cacheSliceActions = cacheSlice.actions;
 export default cacheSlice.reducer;

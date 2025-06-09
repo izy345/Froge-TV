@@ -9,7 +9,7 @@ import {
 } from "@shopify/react-native-skia";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
-import EmoteGifEncoderModule from "../../modules/emote-gif-encoder/src/EmoteGifEncoderModule";
+import { maybeEncodeAndAppendAnimationCache } from "../../store/cache/cache-slice";
 
 const animationStartTime = Date.now();
 
@@ -89,12 +89,16 @@ export default function EmoteSync({ emoteId, source, style }) {
             cachedEmote.frameDurations,
             startIndex
         );
-        
-        EmoteGifEncoderModule.encodeGif(reorderedFrames, reorderedDurations)
-            .then((path) => {
-                //console.log('cachedEmote', cachedEmote);
-                //console.log(`data:image/gif;base64,${path}`)
-                setGifUri(`data:image/gif;base64,${path}`);
+        dispatch(maybeEncodeAndAppendAnimationCache({
+            emoteUrl: source,
+            timeIndex: startIndex,
+            base64Frames: reorderedFrames,
+            frameDurations: reorderedDurations,
+            totalNumberOfFrames: cachedEmote.frameCount,
+            maxCacheSize: 1000,
+            forgive: 0,
+        })).then(({ base64 }) => {
+                setGifUri(base64);
             })
             .catch(console.warn);
     }, [cachedEmote]);
