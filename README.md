@@ -79,7 +79,7 @@ MIT © 2025 FrogeTV Contributors
 
 ## 📝 Todo
 
-- [ ] Sync emotes playback  
+- [ ] Sync emotes playback  (95% complete, can be activated to try out in settings/experimental )
 - [ ] Better PiP support on Android  
 
 > I’m exploring and learning native development to handle these features. Contributions are welcome!
