@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { Text, StyleSheet, Pressable } from "react-native";
 import { Image } from "expo-image";
 import EmoteBehavior from "./EmoteBahavior";
@@ -16,7 +16,8 @@ function EmoteRenderer({
     attemptEmoteSync = false,
 }) {
     const dispatch = useDispatch();
-    
+
+    const animationStartTime = useRef(Date.now()).current;
 
     const { combinedEmotes, formattedTwitchEmotes } = useMemo(() => {
         let baseEmotes = [...emotes];
@@ -171,6 +172,7 @@ function EmoteRenderer({
                                     source={emote.emoteUrl}
                                     style={emoteStyle}
                                     emoteId={emote.emoteUrl}
+                                    animationStartTime={animationStartTime}
                                 />
                             :
                                 <Image
