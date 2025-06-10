@@ -17,7 +17,6 @@ function EmoteRenderer({
 }) {
     const dispatch = useDispatch();
 
-    const animationStartTime = useRef(Date.now()).current;
 
     const { combinedEmotes, formattedTwitchEmotes } = useMemo(() => {
         let baseEmotes = [...emotes];
@@ -172,7 +171,6 @@ function EmoteRenderer({
                                     source={emote.emoteUrl}
                                     style={emoteStyle}
                                     emoteId={emote.emoteUrl}
-                                    animationStartTime={animationStartTime}
                                 />
                             :
                                 <Image

@@ -11,7 +11,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
 import { maybeEncodeAndAppendAnimationCache } from "../../store/cache/cache-slice";
 
-export default function EmoteSync({ emoteId, source, style, animationStartTime }) {
+const animationStartTime = Date.now();
+
+export default function EmoteSync({ emoteId, source, style }) {
     const dispatch = useDispatch();
 
     const width = style.width ?? 32;
