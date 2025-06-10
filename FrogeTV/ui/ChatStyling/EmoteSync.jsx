@@ -19,6 +19,7 @@ export default function EmoteSync({ emoteId, source, style, animationStartTime }
 
     const memoizedSource = useMemo(() => source, [source]);
     const animatedImage = useAnimatedImage(memoizedSource);
+    const staticImage = useImage(memoizedSource)
 
     const cachedEmote = useSelector(getEmoteData(emoteId));
     const maxEmoteCacheSize = useSelector((state) => state.config.maxEmoteCacheSize)
@@ -27,8 +28,7 @@ export default function EmoteSync({ emoteId, source, style, animationStartTime }
     const [gifUri, setGifUri] = useState(null);
     const skiaImage = useAnimatedImageValue(
         gifUri
-    );
-
+    );;
 
     useEffect(() => {
         if (!animatedImage || cachedEmote) return;
@@ -103,9 +103,24 @@ export default function EmoteSync({ emoteId, source, style, animationStartTime }
             .catch(console.warn);
     }, [cachedEmote]);
 
-    if (!skiaImage) {
+    /*if (!skiaImage || !gifUri) {
         return <View style={[styles.placeholder, { width, height }]} />;
-    }
+    }*/
+
+    if (!skiaImage || !gifUri) {
+    return(
+        <Canvas style={[{ width, height }, style]}>
+            <Image
+                image={staticImage}
+                x={0}
+                y={0}
+                width={width}
+                height={height}
+                fit="contain"
+                opacity={0.5}
+            />
+        </Canvas>)
+}
 
     if (Platform.OS === 'ios'){
         return (
@@ -133,6 +148,6 @@ export default function EmoteSync({ emoteId, source, style, animationStartTime }
 
 const styles = StyleSheet.create({
     placeholder: {
-        backgroundColor: "#1a1a1a",
+        backgroundColor: "#515151",
     },
 });
