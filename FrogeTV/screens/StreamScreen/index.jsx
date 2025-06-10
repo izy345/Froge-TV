@@ -54,7 +54,7 @@ function StreamScreen({ route, navigation }) {
             dispatch(chatInputSliceActions.setChatInput(''))
             dispatch(chatInputSliceActions.setReplyingTo(null))
             dispatch(chatInputSliceActions.setShowEmoteList(false))
-            dispatch(cacheSliceActions.setAnimationCache([]))
+            //dispatch(cacheSliceActions.setAnimationCache([]))
         }
     },[])
 
