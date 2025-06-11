@@ -8,7 +8,10 @@ const cacheSlice = createSlice({
         categoryCache: [],
         streamCardCache: [],
         emoteCache: [],
-        animationCache: []
+        animationCache: {
+            map: {}, // key: emoteUrl, value: EmoteEntry
+            order: [], // LRU list of emoteUrls
+        }
 
     },
     reducers: {
@@ -96,86 +99,91 @@ export const getEmoteData = (emoteId) => (state) =>
 // helper mod function
 const mod = (n, m) => ((n % m) + m) % m;
 
-export const maybeEncodeAndAppendAnimationCache = 
-    ({
-        emoteUrl,
-        timeIndex,
-        base64Frames,
-        frameDurations,
-        totalNumberOfFrames,
-        maxCacheSize = 1000,
-        forgive = 0,
-    }) => async (dispatch, getState) => {
-    const animationCache = getState().cache.animationCache;
-    let newCache = [...animationCache];
+export const maybeEncodeAndAppendAnimationCache = ({
+    animationCache,
+    emoteUrl,
+    timeIndex,
+    base64Frames,
+    frameDurations,
+    totalNumberOfFrames,
+    maxCacheSize = 1000,
+    forgive = 0,
+}) => async (dispatch, getState) => {
+    //const { animationCache } = getState().cache;
 
-    // Find index and entry for emote
-    let emoteEntryIndex = newCache.findIndex(e => e.emoteUrl === emoteUrl);
-    let emoteEntry;
+    // Use a mutable copy
+    const map = { ...animationCache.map };
+    const order = [...animationCache.order]; // LRU order of emoteUrls (most recent at front)
 
-    if (emoteEntryIndex === -1) {
+    let emoteEntry = map[emoteUrl];
+
+    if (!emoteEntry) {
         emoteEntry = {
             emoteUrl,
             totalFrames: totalNumberOfFrames,
-            lastUsed: Date.now(),
-            frames: [],
+            frames: {},
         };
-        newCache.unshift(emoteEntry);
     } else {
-        // Clone to safely mutate
-        emoteEntry = { ...newCache[emoteEntryIndex] };
-        emoteEntry.lastUsed = Date.now();
-
-        // Clone frames array to safely mutate
-        emoteEntry.frames = [...emoteEntry.frames];
-
-        // Remove old frozen object, insert new mutable copy at front for LRU
-        newCache.splice(emoteEntryIndex, 1);
-        newCache.unshift(emoteEntry);
+        // Deep clone the object to make it mutable
+        emoteEntry = {
+            ...emoteEntry,
+            frames: { ...emoteEntry.frames },
+        };
     }
 
-    // Find exact or forgiving match by timeIndex
-    let matchFrameIndex = emoteEntry.frames.findIndex(f => f.timeIndex === timeIndex);
+    // Replace or insert into the cache
+    map[emoteUrl] = emoteEntry;
 
-    if (matchFrameIndex === -1 && forgive > 0) {
+    // Update LRU order
+    const idx = order.indexOf(emoteUrl);
+    if (idx !== -1) order.splice(idx, 1);
+    order.unshift(emoteUrl);
+
+    // Check for cache hit
+    let frameKey = timeIndex;
+    let matchFrame = emoteEntry.frames[frameKey];
+
+    if (!matchFrame && forgive > 0) {
         for (let offset = -forgive; offset <= forgive; offset++) {
-            const forgivingIndex = mod(timeIndex + offset, totalNumberOfFrames);
-            matchFrameIndex = emoteEntry.frames.findIndex(f => f.timeIndex === forgivingIndex);
-            if (matchFrameIndex !== -1) break;
+            const forgivingKey = mod(timeIndex + offset, totalNumberOfFrames);
+            if (emoteEntry.frames[forgivingKey]) {
+                frameKey = forgivingKey;
+                matchFrame = emoteEntry.frames[forgivingKey];
+                break;
+            }
         }
     }
 
-    if (matchFrameIndex !== -1) {
-        // Cache hit: Move frame to front and return cached base64
-        const matchFrame = emoteEntry.frames.splice(matchFrameIndex, 1)[0];
-        emoteEntry.frames.unshift(matchFrame);
-        //console.log(`Found cached frame for emote ${emoteUrl} at timeIndex ${timeIndex}`);
-        dispatch(cacheSliceActions.setAnimationCache(newCache));  // Dispatch updated cache
-        return { updatedCache: newCache, base64: matchFrame.base64 };
+    if (matchFrame) {
+        // Hit: no need to modify frames; we don't LRU-sort them here
+        dispatch(cacheSliceActions.setAnimationCache({ map, order }));
+        return { updatedCache: { map, order }, base64: matchFrame.base64 };
     }
 
-    // Cache miss: encode entire emote to GIF base64 using native module
-    
-    //console.log(`No cached frame found for emote ${emoteUrl} at timeIndex ${timeIndex}`);
+    // Miss: encode and insert
     const encodedBase64 = await EmoteGifEncoderModule.encodeGif(base64Frames, frameDurations);
     const base64 = `data:image/gif;base64,${encodedBase64}`;
+    emoteEntry.frames[timeIndex] = { base64 };
 
-    // Add new encoded frame (timeIndex, base64)
-    emoteEntry.frames.unshift({ timeIndex, base64 });
-
-    // Prune cache by total frames count
-    const getWeight = e => e.totalFrames;
-    let totalWeight = newCache.reduce((sum, e) => sum + getWeight(e), 0);
-
-    while (totalWeight > maxCacheSize * 30) {
-        const oldest = newCache.pop();
-        totalWeight -= getWeight(oldest);
+    // Total weight calculation
+    let totalWeight = 0;
+    for (const url of order) {
+        const entry = map[url];
+        totalWeight += entry?.totalFrames || 0;
     }
 
-    dispatch(cacheSliceActions.setAnimationCache(newCache));  // Dispatch updated cache
+    // Prune least recently used until within limits
+    while (totalWeight > maxCacheSize * 30 && order.length > 0) {
+        const oldestUrl = order.pop();
+        const removed = map[oldestUrl];
+        totalWeight -= removed?.totalFrames || 0;
+        delete map[oldestUrl];
+    }
 
-    return { updatedCache: newCache, base64 };
+    dispatch(cacheSliceActions.setAnimationCache({ map, order }));
+    return { updatedCache: { map, order }, base64 };
 };
+
 
 
 
