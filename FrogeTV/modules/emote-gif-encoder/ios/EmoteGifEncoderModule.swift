@@ -34,6 +34,7 @@ public class EmoteGifEncoderModule: Module {
         // Frame properties only need delay time
         let frameProps: CFDictionary = [
           kCGImagePropertyGIFDictionary: [
+            kCGImagePropertyGIFDelayTime: delayTime,
             kCGImagePropertyGIFUnclampedDelayTime: delayTime
           ]
         ] as CFDictionary

@@ -26,6 +26,7 @@ export default function EmoteSync({ emoteId, source, style }) {
     const cachedEmote = useSelector(getEmoteData(emoteId));
     const maxEmoteCacheSize = useSelector((state) => state.config.maxEmoteCacheSize)
     const forgiveCacheIndex = useSelector((state) => state.config.forgiveCacheIndex) 
+    const animationCache = useSelector((state) => state.cache.animationCache);
 
     const [gifUri, setGifUri] = useState(null);
     const skiaImage = useAnimatedImageValue(
@@ -62,7 +63,7 @@ export default function EmoteSync({ emoteId, source, style }) {
     }, [animatedImage, cachedEmote]);
 
     useEffect(() => {
-        if (!cachedEmote?.base64Frames?.length || !cachedEmote.frameDurations){
+        if (!cachedEmote?.base64Frames?.length || !cachedEmote.frameDurations || gifUri !== null){
             return;
         }
         //console.log("Encoding GIF for emote:", emoteId);
@@ -92,6 +93,7 @@ export default function EmoteSync({ emoteId, source, style }) {
             startIndex
         );
         dispatch(maybeEncodeAndAppendAnimationCache({
+            animationCache,
             emoteUrl: source,
             timeIndex: startIndex,
             base64Frames: reorderedFrames,
@@ -122,21 +124,6 @@ export default function EmoteSync({ emoteId, source, style }) {
                 opacity={0.5}
             />
         </Canvas>)
-}
-
-    if (Platform.OS === 'ios'){
-        return (
-            <Canvas style={[{ width, height }, style]}>
-                <Image
-                    image={skiaImage}
-                    x={0}
-                    y={0}
-                    width={width}
-                    height={height}
-                    fit="contain"
-                />
-            </Canvas>
-        );
     } else{
         return (
             <RNImage
