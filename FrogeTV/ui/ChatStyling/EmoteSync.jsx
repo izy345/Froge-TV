@@ -124,21 +124,6 @@ export default function EmoteSync({ emoteId, source, style }) {
                 opacity={0.5}
             />
         </Canvas>)
-}
-
-    if (Platform.OS === 'ios'){
-        return (
-            <Canvas style={[{ width, height }, style]}>
-                <Image
-                    image={skiaImage}
-                    x={0}
-                    y={0}
-                    width={width}
-                    height={height}
-                    fit="contain"
-                />
-            </Canvas>
-        );
     } else{
         return (
             <RNImage
