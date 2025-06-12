@@ -8,6 +8,7 @@ import {
     useAnimatedImageValue,
 } from "@shopify/react-native-skia";
 import { useDispatch, useSelector } from "react-redux";
+import { Image as ExImage } from "expo-image";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
 import { maybeEncodeAndAppendAnimationCache } from "../../store/cache/cache-slice";
 
@@ -21,7 +22,7 @@ export default function EmoteSync({ emoteId, source, style }) {
 
     const memoizedSource = useMemo(() => source, [source]);
     const animatedImage = useAnimatedImage(memoizedSource);
-    const staticImage = useImage(memoizedSource)
+    //const staticImage = useImage(memoizedSource)
 
     const cachedEmote = useSelector(getEmoteData(emoteId));
     const maxEmoteCacheSize = useSelector((state) => state.config.maxEmoteCacheSize)
@@ -113,17 +114,12 @@ export default function EmoteSync({ emoteId, source, style }) {
 
     if (!skiaImage || !gifUri) {
     return(
-        <Canvas style={[{ width, height }, style]}>
-            <Image
-                image={staticImage}
-                x={0}
-                y={0}
-                width={width}
-                height={height}
-                fit="contain"
-                opacity={0.5}
-            />
-        </Canvas>)
+        <ExImage
+        source={source}
+        style={[{ width, height, opacity: .67 }, style]}
+        opaci
+        />
+    )
     } else{
         return (
             <RNImage

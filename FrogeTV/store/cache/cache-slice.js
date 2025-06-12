@@ -143,8 +143,10 @@ export const maybeEncodeAndAppendAnimationCache = ({
     let frameKey = timeIndex;
     let matchFrame = emoteEntry.frames[frameKey];
 
-    if (!matchFrame && forgive > 0) {
-        for (let offset = -forgive; offset <= forgive; offset++) {
+    const dynamicForgive = totalNumberOfFrames > 20 ? Math.max(forgive, Math.max(1, Math.floor(totalNumberOfFrames * 0.02))) : 0;
+
+    if (!matchFrame && dynamicForgive > 0) {
+        for (let offset = -dynamicForgive; offset <= dynamicForgive; offset++) {
             const forgivingKey = mod(timeIndex + offset, totalNumberOfFrames);
             if (emoteEntry.frames[forgivingKey]) {
                 frameKey = forgivingKey;
@@ -161,6 +163,7 @@ export const maybeEncodeAndAppendAnimationCache = ({
     }
 
     // Miss: encode and insert
+    //console.log(`Encoding GIF for emote: ${emoteUrl} at time index: ${timeIndex}, total frames: ${totalNumberOfFrames}, Dynamic Forgive: ${dynamicForgive}`);
     const encodedBase64 = await EmoteGifEncoderModule.encodeGif(base64Frames, frameDurations);
     const base64 = `data:image/gif;base64,${encodedBase64}`;
     emoteEntry.frames[timeIndex] = { base64 };
