@@ -98,7 +98,7 @@ export const getEmoteData = (emoteId) => (state) =>
 // set and/or get animation cache 
 // helper mod function
 const mod = (n, m) => ((n % m) + m) % m;
-
+// for tomorrow: make more reducer setters to avoid needing to clone the object
 export const maybeEncodeAndAppendAnimationCache = ({
     animationCache,
     emoteUrl,

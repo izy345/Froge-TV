@@ -112,19 +112,18 @@ export default function EmoteSync({ emoteId, source, style }) {
         return <View style={[styles.placeholder, { width, height }]} />;
     }*/
 
-    if (!skiaImage || !gifUri) {
+    if ((!skiaImage || !gifUri) && Platform.OS === 'ios') {
     return(
         <ExImage
         source={source}
-        style={[{ width, height, opacity: .67 }, style]}
-        opaci
+        style={[{ width, height, opacity: .65 }, style]}
         />
     )
     } else{
         return (
             <RNImage
-                source={{ uri: gifUri }}
-                style={[{ width, height }, style]}
+                source={{ uri: gifUri || source }}
+                style={[{ width, height, opacity: gifUri === null ? .65 : 1 }, style]}
                 resizeMode="contain"
             />
         );
