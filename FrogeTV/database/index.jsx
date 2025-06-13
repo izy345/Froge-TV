@@ -72,6 +72,8 @@ export async function updateAnimatedEmoteRange(animatedEmote, range = 0, base64F
     try {
         let matchTimeIndex = animatedEmote.timeIndex;
 
+        range = animatedEmote.totalNumberOfFrames > 25 ? Math.max(range, Math.max(1, Math.floor(animatedEmote.totalNumberOfFrames * 0.02))) : 0;
+
         if (range > 0) {
             // Fetch all possible timeIndex values for this emoteUrl
             const queryResult = await database.getAllAsync(
