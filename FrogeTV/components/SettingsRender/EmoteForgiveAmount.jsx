@@ -11,15 +11,17 @@ import { configSliceActions } from '../../store/Configuration/config-slice';
 function EmoteForgiveAmount() {
     const dispatch = useDispatch();
     const forgiveCacheIndex = useSelector((state) => state.config.forgiveCacheIndex) || 2;
+    const [value, setValue] = useState(forgiveCacheIndex);
 
     const handleSlidingComplete = (value) => {
+        setValue(value); // Update local state when sliding is complete
         dispatch(configSliceActions.setForgiveCacheIndex(value)); // Update Redux state when sliding is complete
     };
 
     return (
         <View style={commonStyles.settingsContainer}>
             <View style={styles.settingsRow}>
-                <Text style={styles.subText}>Diverge Requirement</Text>
+                <Text style={styles.subText}>Min Diverge Requirement</Text>
             </View>
             <View style={styles.sliderContainer}>
                 <Slider
@@ -27,7 +29,8 @@ function EmoteForgiveAmount() {
                     minimumValue={0}
                     maximumValue={5}
                     step={1}
-                    value={forgiveCacheIndex}
+                    value={value}
+                    onValueChange={(val) => setValue(val)}
                     onSlidingComplete={handleSlidingComplete} // Update Redux state
                     minimumTrackTintColor={Colors.twitchPurple1000}
                     maximumTrackTintColor={Colors.twitchWhite1000}
@@ -36,7 +39,7 @@ function EmoteForgiveAmount() {
                 <TextInput
                     style={styles.textInput}
                     keyboardType="numeric"
-                    value={forgiveCacheIndex.toString()}
+                    value={value.toString()}
                     editable={false}
                 />
             </View>
@@ -45,6 +48,7 @@ function EmoteForgiveAmount() {
                     If Sync Emotes is enabled, this will determine how far the playback (frames) need to diverge before the emote is encoded and cached.
                     Increase for less frequent cache and encoding updates, decrease for more responsiveness.
                     For a general rule, the higher the number, the less frequent your device will be required to cache and encode at the cost of emotes being less synchronization.
+                    Since this setting is the minimum diverge requirement, higher values will be used by default for high fps emotes.
                 </Text>
             </View>
         </View>

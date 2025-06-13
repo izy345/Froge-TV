@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Image as ExImage } from "expo-image";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
 import { maybeEncodeAndAppendAnimationCache } from "../../store/cache/cache-slice";
+import { updateAnimatedEmoteRange, pruneOldEntriesIfNeeded, fetchBase64Data } from "../../database";
 
 const animationStartTime = Date.now();
 
@@ -27,6 +28,8 @@ export default function EmoteSync({ emoteId, source, style }) {
     const cachedEmote = useSelector(getEmoteData(emoteId));
     const maxEmoteCacheSize = useSelector((state) => state.config.maxEmoteCacheSize)
     const forgiveCacheIndex = useSelector((state) => state.config.forgiveCacheIndex) 
+    const EmoteSyncUseDatabase = useSelector((state) => state.config.EmoteSyncUseDatabase);
+
     const animationCache = useSelector((state) => state.cache.animationCache);
 
     const [gifUri, setGifUri] = useState(null);
@@ -93,19 +96,53 @@ export default function EmoteSync({ emoteId, source, style }) {
             cachedEmote.frameDurations,
             startIndex
         );
-        dispatch(maybeEncodeAndAppendAnimationCache({
-            animationCache,
-            emoteUrl: source,
-            timeIndex: startIndex,
-            base64Frames: reorderedFrames,
-            frameDurations: reorderedDurations,
-            totalNumberOfFrames: cachedEmote.frameCount,
-            maxCacheSize: maxEmoteCacheSize,
-            forgive: forgiveCacheIndex,
-        })).then(({ base64 }) => {
-                setGifUri(base64);
+        if (!EmoteSyncUseDatabase){
+            dispatch(maybeEncodeAndAppendAnimationCache({
+                animationCache,
+                emoteUrl: source,
+                timeIndex: startIndex,
+                base64Frames: reorderedFrames,
+                frameDurations: reorderedDurations,
+                totalNumberOfFrames: cachedEmote.frameCount,
+                maxCacheSize: maxEmoteCacheSize,
+                forgive: forgiveCacheIndex,
+            })).then(({ base64 }) => {
+                    setGifUri(base64);
+                })
+                .catch(console.warn);
+        } else{
+            updateAnimatedEmoteRange(
+                {
+                emoteUrl: source,
+                timeIndex: startIndex,
+                totalNumberOfFrames: cachedEmote.frameCount,
+                },
+                forgiveCacheIndex,
+                reorderedFrames,
+                reorderedDurations
+            ).then((emote) => {
+                // console.log("Emote updated in database:", emote);
+                if(emote){
+                    setGifUri(emote.base64Frames);
+                }
+            }).then( () => {
+                pruneOldEntriesIfNeeded(maxEmoteCacheSize);
             })
-            .catch(console.warn);
+            .catch(
+                // fallback to just fetching from database
+                fetchBase64Data(source, startIndex)
+                    .then((emote) => {
+                        if (emote) {
+                            setGifUri(emote.base64Frames);
+                        } else {
+                            //console.warn("Emote not found in database:", source, startIndex);
+                        }
+                    })
+                    .catch((error) => {
+                        //console.warn("Error fetching emote from database:", error);
+                    })
+            );
+        }
     }, [cachedEmote]);
 
     /*if (!skiaImage || !gifUri) {
