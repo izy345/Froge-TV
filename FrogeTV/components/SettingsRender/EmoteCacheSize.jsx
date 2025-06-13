@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Platform } from 'react-native';
 import { store } from '../../store';
 import Slider from '@react-native-community/slider';
 import Colors, { commonStyles } from '../../constants';
@@ -30,7 +30,11 @@ function EmoteCacheSize() {
                     maximumValue={5000}
                     step={100}
                     value={value}
-                    onValueChange={(val) => setValue(val)} // Update local state on sliding// Reset to current value on sliding start
+                    onValueChange={(val) => {
+                        if (Platform.OS === 'ios'){
+                        setValue(val)
+                        }
+                    }}
                     onSlidingComplete={handleSlidingComplete} // Update Redux state
                     minimumTrackTintColor={Colors.twitchPurple1000}
                     maximumTrackTintColor={Colors.twitchWhite1000}

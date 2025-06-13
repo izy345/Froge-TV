@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Platform } from 'react-native';
 import { store } from '../../store';
 import Slider from '@react-native-community/slider';
 import Colors, { commonStyles } from '../../constants';
@@ -30,7 +30,11 @@ function EmoteForgiveAmount() {
                     maximumValue={5}
                     step={1}
                     value={value}
-                    onValueChange={(val) => setValue(val)}
+                    onValueChange={(val) => {
+                        if (Platform.OS === 'ios'){
+                        setValue(val)
+                        }
+                    }}
                     onSlidingComplete={handleSlidingComplete} // Update Redux state
                     minimumTrackTintColor={Colors.twitchPurple1000}
                     maximumTrackTintColor={Colors.twitchWhite1000}
