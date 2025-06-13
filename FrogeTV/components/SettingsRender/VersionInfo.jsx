@@ -15,7 +15,7 @@ function VersionInfo() {
         </View>
         <View>
             <Text style={commonStyles.settingsText}>
-                Current App Version: v1.0.7b
+                Current App Version: v1.0.7c
             </Text>
             <Text style={commonStyles.settingsText}>
                 Software Author: Israel G.

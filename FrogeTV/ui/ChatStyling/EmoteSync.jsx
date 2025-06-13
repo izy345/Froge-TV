@@ -33,9 +33,6 @@ export default function EmoteSync({ emoteId, source, style }) {
     const animationCache = useSelector((state) => state.cache.animationCache);
 
     const [gifUri, setGifUri] = useState(null);
-    const skiaImage = useAnimatedImageValue(
-        gifUri
-    );;
 
     useEffect(() => {
         if (!animatedImage || cachedEmote) return;
@@ -149,22 +146,23 @@ export default function EmoteSync({ emoteId, source, style }) {
         return <View style={[styles.placeholder, { width, height }]} />;
     }*/
 
-    if ((!skiaImage || !gifUri) && Platform.OS === 'ios') {
     return(
-        <ExImage
-        source={source}
-        style={[{ width, height, opacity: .65 }, style]}
-        />
-    )
-    } else{
-        return (
+        <>
+        {!gifUri ?
+            <ExImage
+                source={source}
+                style={[{ width, height, opacity: .65 }, style]}
+                cachePolicy="memory"
+            />
+            :
             <RNImage
-                source={{ uri: gifUri || source }}
+                source={{ uri: !gifUri ? source : gifUri }}
                 style={[{ width, height, opacity: gifUri === null ? .65 : 1 }, style]}
                 resizeMode="contain"
             />
+        }
+        </>
         );
-    }
 }
 
 const styles = StyleSheet.create({
