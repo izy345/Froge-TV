@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { View, Image, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { useSelector } from "react-redux";
 import Colors from "../../constants";
 
@@ -22,6 +23,7 @@ function TwitchBadgeRenderer({ badges }) {
                         key={badgeId}
                         source={{ uri: matchingBadge.url }}
                         style={styles.badge}
+                        cachePolicy="memory-disk"
                     />
                 );
             })
