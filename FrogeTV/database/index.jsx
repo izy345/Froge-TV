@@ -98,13 +98,12 @@ export async function updateAnimatedEmoteRange(animatedEmote, range = 0, base64F
 
             if (match) {
                 matchTimeIndex = match.timeIndex;
-                return fetchBase64Data(animatedEmote.emoteUrl, matchTimeIndex);
                 //console.log(`[Database] Forgiving match found: ${matchTimeIndex}`);
             } else {
                 //console.warn("[Database] No matching timeIndex found within forgiveness window");
+                return insertAnimatedEmote(animatedEmote, base64Frames, frameDurations)
             }
         }
-
         const result = await database.runAsync(
             `
             UPDATE AnimatedEmotes
@@ -118,9 +117,10 @@ export async function updateAnimatedEmoteRange(animatedEmote, range = 0, base64F
         );
 
         if (result && result.changes === 1) {
-            //console.log("[Database] Update succeeded.", result);
+            console.log("[Database] Update succeeded.", result);
             return fetchBase64Data(animatedEmote.emoteUrl, matchTimeIndex);
         } else {
+            console.log('hi2')
             //console.warn("[Database] No rows updated after forgiving match check.", result);
             return insertAnimatedEmote(animatedEmote, base64Frames, frameDurations);
         }
