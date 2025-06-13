@@ -12,6 +12,8 @@ import VersionInfo from './VersionInfo'
 import SyncEmote from './SyncEmotes'
 import EmoteCacheSize from './EmoteCacheSize'
 import EmoteForgiveAmount from './EmoteForgiveAmount'
+import EmoteSyncImplementation from './EmoteSyncImplementation'
+import ClearDatabase from './ClearDatabase'
 
 function SettingsRender() {
     return (
@@ -26,6 +28,8 @@ function SettingsRender() {
         <ChatShow7TVEmotes />
         <Text style={styles.boldText}> Experimental</Text>
         <SyncEmote />
+        <EmoteSyncImplementation />
+        <ClearDatabase />
         <EmoteCacheSize />
         <EmoteForgiveAmount />
         <VersionInfo />

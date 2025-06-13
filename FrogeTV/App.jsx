@@ -7,6 +7,7 @@ import { Platform, Text} from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 import ExpoPip from "expo-pip";
 import PIPModeAndroid from './routes/PIPModeAndroid'
+import { init, clearDatabase } from './database';
 //import expoAndroidPip from './modules/expo-android-pip';
 
 export default function App() {
@@ -18,6 +19,16 @@ export default function App() {
             NavigationBar.setButtonStyleAsync('light'); 
         }
     }, []);
+
+    useEffect(() => {
+        init()
+        .then(() => {
+            console.log('Initialized database')
+        })
+        .catch((err) => {
+            console.log('Initialize database failed:', err)
+        })
+},[])
     
     return (
         <Provider store={store}>

@@ -11,8 +11,10 @@ import { configSliceActions } from '../../store/Configuration/config-slice';
 function EmoteCacheSize() {
     const dispatch = useDispatch();
     const maxEmoteCacheSize = useSelector((state) => state.config.maxEmoteCacheSize) || 250;
+    const [value, setValue] = useState(maxEmoteCacheSize);
 
     const handleSlidingComplete = (value) => {
+        setValue(value); // Update local state when sliding is complete
         dispatch(configSliceActions.setMaxEmoteCacheSize(value)); // Update Redux state when sliding is complete
     };
 
@@ -25,9 +27,10 @@ function EmoteCacheSize() {
                 <Slider
                     style={styles.slider}
                     minimumValue={100}
-                    maximumValue={2000}
+                    maximumValue={5000}
                     step={100}
-                    value={maxEmoteCacheSize}
+                    value={value}
+                    onValueChange={(val) => setValue(val)} // Update local state on sliding// Reset to current value on sliding start
                     onSlidingComplete={handleSlidingComplete} // Update Redux state
                     minimumTrackTintColor={Colors.twitchPurple1000}
                     maximumTrackTintColor={Colors.twitchWhite1000}
@@ -36,7 +39,7 @@ function EmoteCacheSize() {
                 <TextInput
                     style={styles.textInput}
                     keyboardType="numeric"
-                    value={maxEmoteCacheSize.toString()}
+                    value={value.toString()}
                     editable={false}
                 />
             </View>
@@ -44,6 +47,8 @@ function EmoteCacheSize() {
                 <Text style={commonStyles.settingsText}>
                     If Sync Emotes is enabled, this will adjust the max number of emotes that are temporarily stored in memory.
                     Adjust this to avoid excessive memory usage or unforeseen crashes.
+                    High nuumber is only recommended if you have 'Use Emote Sync Database' enabled.
+                    For performance reasons, older emotes will be removed from memory when as it reaches the max amount.
                 </Text>
             </View>
         </View>

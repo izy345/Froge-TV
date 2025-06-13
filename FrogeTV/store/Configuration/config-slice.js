@@ -11,6 +11,7 @@ const configSlice = createSlice({
         attemptEmoteSync: false, // sync emote playback
         maxEmoteCacheSize: 1000, // max emotes in cache (this affects animated emotes only)
         forgiveCacheIndex: 2, // if index playback is withing this amount, reuse the emote already in cache, skipping the GIF encoding process.
+        EmoteSyncUseDatabase: false, // use RAM for EmoteSync instead of disk
         // badges
         showBTTVBadges: true,
         showFFZBadges: true,
@@ -45,6 +46,9 @@ const configSlice = createSlice({
         },
         setForgiveCacheIndex(state, action) {
             state.forgiveCacheIndex = action.payload;
+        },
+        setEmoteSyncUseDatabase(state, action) {
+            state.EmoteSyncUseDatabase = action.payload;
         },
         // ExploreHistory saved
         setExploreHistory(state, action) {
