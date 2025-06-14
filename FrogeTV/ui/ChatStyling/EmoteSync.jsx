@@ -7,6 +7,7 @@ import {
     useImage,
     useAnimatedImageValue,
 } from "@shopify/react-native-skia";
+import { GifPlayerView } from 'react-native-gif-player';
 import { useDispatch, useSelector } from "react-redux";
 import { Image as ExImage } from "expo-image";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
@@ -150,14 +151,14 @@ export default function EmoteSync({ emoteId, source, style }) {
         <>
         {!gifUri ?
             <ExImage
-                source={source}
-                style={[{ width, height, opacity: .65 }, style]}
+                source={{uri: source}}
+                style={[{ width, height, opacity: .25 }, style]}
                 cachePolicy="memory"
             />
             :
             <RNImage
-                source={{ uri: !gifUri ? source : gifUri }}
-                style={[{ width, height, opacity: gifUri === null ? .65 : 1 }, style]}
+                source={{ uri: gifUri }}
+                style={[{ width, height, opacity: gifUri === null ? .25 : 1 }, style]}
                 resizeMode="contain"
             />
         }

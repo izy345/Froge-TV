@@ -109,7 +109,10 @@ export async function updateAnimatedEmoteRange(animatedEmote, range = 0, base64F
         const result = await database.runAsync(
             `
             UPDATE AnimatedEmotes
-            SET usageCount = usageCount + 1
+            SET usageCount = CASE 
+                WHEN usageCount < 3 THEN usageCount + 1 
+                ELSE 3 
+            END
             WHERE emoteUrl = ? AND timeIndex = ?
             `,
             [
