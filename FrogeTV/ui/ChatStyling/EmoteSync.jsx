@@ -7,7 +7,6 @@ import {
     useImage,
     useAnimatedImageValue,
 } from "@shopify/react-native-skia";
-import { GifPlayerView } from 'react-native-gif-player';
 import { useDispatch, useSelector } from "react-redux";
 import { Image as ExImage } from "expo-image";
 import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
