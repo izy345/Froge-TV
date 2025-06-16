@@ -10,49 +10,53 @@ function RenderEmoteItem({ item, size = 32, margin = 6, allowAutoResize = false 
     const chatInput = useSelector((state) => state.chatInput.chatInput);
 
     const handlePress = useCallback(() => {
-        // Split the current chatInput into tokens.
-        const tokens = chatInput.split(" ");
-        const lastToken = tokens[tokens.length - 1] || "";
-        const lowerLast = lastToken.toLowerCase();
-        const lowerEmote = item.emoteName.toLowerCase();
+        try{
+            // Split the current chatInput into tokens.
+            const tokens = chatInput.split(" ");
+            const lastToken = tokens[tokens.length - 1] || "";
+            const lowerLast = lastToken.toLowerCase();
+            const lowerEmote = item.emoteName.toLowerCase();
 
-        let newInput = "";
+            let newInput = "";
 
-        if (lastToken && lowerLast === lowerEmote) {
-            // Exact match: replace token with correctly capitalized emote.
-            tokens[tokens.length - 1] = item.emoteName;
-            newInput = tokens.join(" ");
+            if (lastToken && lowerLast === lowerEmote) {
+                // Exact match: replace token with correctly capitalized emote.
+                tokens[tokens.length - 1] = item.emoteName;
+                newInput = tokens.join(" ");
+                if (!newInput.endsWith(" ")) {
+                    newInput += " ";
+                }
+            } else if (
+                lastToken &&
+                lowerEmote.includes(lowerLast) &&
+                lowerLast !== lowerEmote
+            ) {
+                // Partial match: if the token is the beginning OR the ending of the emote,
+                // replace the token.
+                tokens[tokens.length - 1] = item.emoteName;
+                newInput = tokens.join(" ");
+            } else {
+                console.log("Adding emote to chatInput", item.emoteName);
+                // Append the emote name, checking for trailing space.
+                const trimmed = chatInput.trimEnd();
+                newInput =
+                    trimmed === ""
+                        ? item.emoteName
+                        : trimmed.endsWith(" ")
+                            ? `${trimmed}${item.emoteName}`
+                            : `${trimmed} ${item.emoteName}`;
+            }
+
+            // Ensure newInput ends with a space.
             if (!newInput.endsWith(" ")) {
                 newInput += " ";
             }
-        } else if (
-            lastToken &&
-            lowerEmote.includes(lowerLast) &&
-            lowerLast !== lowerEmote
-        ) {
-            // Partial match: if the token is the beginning OR the ending of the emote,
-            // replace the token.
-            tokens[tokens.length - 1] = item.emoteName;
-            newInput = tokens.join(" ");
-        } else {
-            console.log("Adding emote to chatInput", item.emoteName);
-            // Append the emote name, checking for trailing space.
-            const trimmed = chatInput.trimEnd();
-            newInput =
-                trimmed === ""
-                    ? item.emoteName
-                    : trimmed.endsWith(" ")
-                        ? `${trimmed}${item.emoteName}`
-                        : `${trimmed} ${item.emoteName}`;
-        }
-
-        // Ensure newInput ends with a space.
-        if (!newInput.endsWith(" ")) {
-            newInput += " ";
-        }
-    
-        // Update the chatInput in the Redux store.
+        
+            // Update the chatInput in the Redux store.
         dispatch(chatInputSliceActions.setChatInput(newInput));
+    } catch(error){
+        console.error("Error handling emote press:", error);
+    }
     }, [chatInput, dispatch, item.emoteName]);
 
     const dynamicStyles = useMemo(

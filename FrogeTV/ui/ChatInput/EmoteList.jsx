@@ -5,10 +5,8 @@ import {
     StyleSheet,
     FlatList,
     TouchableOpacity,
-    Dimensions,
 } from "react-native";
 import Colors from "../../constants";
-import { Image } from "expo-image";
 import { useSelector } from "react-redux";
 import RenderEmoteItem from './renderEmoteItem.jsx'
 import { FlashList } from "@shopify/flash-list";
@@ -66,7 +64,7 @@ function EmoteList({height, allEmotes}) {
     const renderEmoteItemMemoized = useCallback(
         ({ item }) => <RenderEmoteItem item={item} />,
         []
-      );
+    );
 
     return (
         <View style={[styles.container, { height: height }]} pointerEvents="box-none">
@@ -132,7 +130,6 @@ function EmoteList({height, allEmotes}) {
                     ? Math.floor(safeStreamWidth / 49)
                     : Math.floor((safeStreamWidth * 0.25) / 49)
                 }
-                contentContainerStyle={styles.emotesList}
                 initialNumToRender={50}
                 maxToRenderPerBatch={50}
                 estimatedItemSize={44}
@@ -202,9 +199,5 @@ const styles = StyleSheet.create({
     typeText: {
         color: Colors.twitchWhite1000,
         fontSize: 12,
-    },
-    emotesList: {
-        width: "100%",
-        pointerEvents: "box-none",
     },
 });

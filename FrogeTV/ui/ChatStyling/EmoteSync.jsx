@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useEffect, useMemo, useRef, memo } from "react";
+import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import { Canvas, Image, useAnimatedImage } from "@shopify/react-native-skia";
 import { useDispatch, useSelector } from "react-redux";
 import { useSharedValue } from "react-native-reanimated";
@@ -7,7 +7,7 @@ import { getEmoteData, cacheSliceActions } from "../../store/cache/cache-slice";
 
 const animationStartTime = Date.now();
 
-export default function EmoteSync({ emoteId, source, style }) {
+function EmoteSync({ emoteId, source, style }) {
     const dispatch = useDispatch();
 
     const flattenedStyle = StyleSheet.flatten(style) || {};
@@ -52,9 +52,8 @@ export default function EmoteSync({ emoteId, source, style }) {
 
     // Sync animation to global time using Date.now()
     useEffect(() => {
-        console.log("[EmoteSync] ", currentFrame);
         if (!cachedEmote?.frames?.length || !cachedEmote.frameDurations) return;
-        console.log("[EmoteSync] cachedEmote: ", cachedEmote);
+
         if (cachedEmote.frameCount <= 1) {
             currentFrame.value = cachedEmote.frames[0];
             return;
@@ -111,6 +110,18 @@ export default function EmoteSync({ emoteId, source, style }) {
         </Canvas>
     );
 }
+
+// Custom memo comparison
+const areEqual = (prevProps, nextProps) => {
+    return (
+        prevProps.emoteId === nextProps.emoteId &&
+        prevProps.source === nextProps.source &&
+        JSON.stringify(StyleSheet.flatten(prevProps.style)) ===
+            JSON.stringify(StyleSheet.flatten(nextProps.style))
+    );
+};
+
+export default memo(EmoteSync, areEqual);
 
 const styles = StyleSheet.create({
     placeholder: {
