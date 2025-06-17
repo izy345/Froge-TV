@@ -11,7 +11,12 @@ const cacheSlice = createSlice({
         animationCache: {
             map: {}, // key: emoteUrl, value: EmoteEntry
             order: [], // LRU list of emoteUrls
-        }
+        },
+        globalEmoteAtlas: {
+            layout: {},
+            width: 0,
+            height: 0,
+        },
 
     },
     reducers: {
@@ -37,6 +42,10 @@ const cacheSlice = createSlice({
         setStreamCardCache(state, action) {
             state.streamCardCache = action.payload;
         },
+        // atlas canvas
+        setGlobalEmoteAtlas(state, action) {
+            state.globalEmoteAtlas = action.payload;
+        },
         // emote cache
         addEmoteCache(state, action) {
             const {
@@ -47,6 +56,9 @@ const cacheSlice = createSlice({
                 frameCount,
                 frames,
                 base64Frames,
+                width,
+                height,
+                maxAmountOfEmotes,
             } = action.payload || {};
         
             if (!emoteId || !emoteUrl) throw new Error("Invalid emote cache payload");
@@ -55,7 +67,7 @@ const cacheSlice = createSlice({
             if (existing) return;
         
             // Remove the oldest emote if the cache size exceeds the limit
-            if (state.emoteCache.length >= 125) {
+            if (state.emoteCache.length >= (maxAmountOfEmotes/7)) {
                 state.emoteCache.shift(); // Remove the first (oldest) emote
             }
         
@@ -67,6 +79,8 @@ const cacheSlice = createSlice({
                 frameCount,
                 frames,
                 base64Frames,
+                width,
+                height,
             });
         },
         setEmoteCache(state, action) {

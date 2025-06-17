@@ -35,32 +35,36 @@ export default function EmoteSync({ emoteId, source, style }) {
     const [gifUri, setGifUri] = useState(null);
 
     useEffect(() => {
-        if (!animatedImage || cachedEmote) return;
-        const frameCount = animatedImage.getFrameCount();
-        const frameDurations = [];
-        const frames = [];
-        const base64Frames = [];
-        for (let i = 0; i < frameCount; i++) {
-            animatedImage.decodeNextFrame();
-            frameDurations.push(animatedImage.currentFrameDuration());
-            const frame = animatedImage.getCurrentFrame();
-            frames.push(frame);
-            const base64 = frame.encodeToBase64();
-            base64Frames.push(base64);
+        if (animatedImage && !cachedEmote){
+            const frameCount = animatedImage.getFrameCount();
+            const frameDurations = [];
+            const frames = [];
+            const base64Frames = [];
+            for (let i = 0; i < frameCount; i++) {
+                animatedImage.decodeNextFrame();
+                frameDurations.push(animatedImage.currentFrameDuration());
+                const frame = animatedImage.getCurrentFrame();
+                frames.push(frame);
+                const base64 = frame.encodeToBase64();
+                base64Frames.push(base64);
+            }
+            
+            const totalDuration = frameDurations.reduce((a, b) => a + b, 0);
+            dispatch(
+                cacheSliceActions.addEmoteCache({
+                    emoteId,
+                    emoteUrl: source,
+                    frameDurations,
+                    totalDuration,
+                    frameCount,
+                    frames,
+                    base64Frames,
+                    width,
+                    height,
+                    maxAmountOfEmotes: maxEmoteCacheSize,
+                })
+            );
         }
-        
-        const totalDuration = frameDurations.reduce((a, b) => a + b, 0);
-        dispatch(
-            cacheSliceActions.addEmoteCache({
-                emoteId,
-                emoteUrl: source,
-                frameDurations,
-                totalDuration,
-                frameCount,
-                frames,
-                base64Frames,
-            })
-        );
     }, [animatedImage, cachedEmote]);
 
     useEffect(() => {
