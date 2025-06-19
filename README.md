@@ -46,11 +46,10 @@ Stream, chat, and use popular extensions (BTTV, FFZ, 7TV) on the go—no comprom
 
 ## 🎨 Architecture
 
-1. **Root-Level APIs** – Expose low-level network hooks for custom use.  
+1. **Root-Level APIs** – Expose low-level network classes for custom use.  
 2. **Virtual List Wrapper** – Seamless scrolling & rotation without losing position.  
-3. **Expo Native Modules** – PiP, background audio, and deeper platform integration.  
-4. **TypeScript Everywhere** – End-to-end type safety.  
-5. **Testing** – Jest + React Native Testing Library for unit & integration tests.
+3. **Expo Native Modules** – Native code for built-in encoding
+
 
 ---
 
